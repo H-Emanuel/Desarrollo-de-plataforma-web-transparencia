@@ -28,32 +28,70 @@
       box-shadow: none;
       color: #fff; /* Mantenemos el color del texto como blanco al hacer clic */
     }
-    .waterContaier{
-        width: 900px;
-        height: 500px;
-        background-color: rgb(0, 153, 255);
-        box-shadow: inset 0 0 50px #333762;
-        position: relative;
-        overflow: hidden;
-        border-radius: 10%;
-        border: 2px solid #e1e1e1; /* Agrega un borde sólido de 2px con color #898989 */
+    .waterContaier {
+    position: relative;
+    width: 900px;
+    height: 500px;
+    background-color: rgb(0, 153, 255);
+    box-shadow: inset 0 0 50px #333762;
+    border-radius: 10%;
+    border: 2px solid #e1e1e1; /* Agrega un borde sólido de 2px con color #898989 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
 
-    }
-    .waterContaier::before{
 
-        position: absolute;
-        content: '';
-        width: 150%;
-        height: 210%;
-        top: -150%;
-        left: -50%;
-        border-radius: 40%;
-        background-color: white;
-        animation: wave 12s infinite linear;
-    }
+.waterContaier a {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 15px;
+    margin: 10px;
+    font-size: 18px;
+    background-color: #9900ff; /* Cambia el color de fondo del botón según sea necesario */
+    border: 2px solid #33333355; /* Cambia el color del borde del botón según sea necesario */
+    border-radius: 15px; /* Ajusta el radio del borde según sea necesario */
+    cursor: pointer;
+    z-index: 2; /* Ajusta el índice z para que esté adelante del pseudo-elemento */
+    width: 50%; /* Ajusta el ancho al 100% para que ocupe todo el ancho disponible */
+    height: 13%; 
+    text-decoration: none;
+    text-align: center;
+    color: #ffffff;
+    transition: background-color 0.3s ease; /* Transición suave */
 
-    .waterContaier::after{
 
+}
+
+.waterContaier a:focus,
+.waterContaier a:hover {
+    background-color: #6700ab; /* Cambia el color de fondo cuando el enlace está enfocado o el mouse está sobre él */
+}
+
+.waterContaier a + a {
+    top: calc(50% + 50px); /* Ajusta la posición vertical del segundo botón */
+}
+
+
+
+.waterContaier::before {
+    position: absolute;
+    content: '';
+    width: 150%;
+    height: 210%;
+    top: -150%;
+    left: -50%;
+    border-radius: 40%;
+    background-color: white;
+    animation: wave 12s infinite linear;
+    z-index: 1; /* Ajusta un índice z menor para que esté detrás de los botones */
+}
+
+
+.waterContaier::after {
     position: absolute;
     content: '';
     width: 160%;
@@ -64,17 +102,17 @@
     background-color: rgba(255, 255, 255, 0.231);
     animation: wave 12s infinite linear;
     animation-delay: 0.5s;
-    }
-    @keyframes wave {
-        0% {
-            transform: rotate(0deg);
-        }
-        100%{
-            transform: rotate(360deg);
-        }
+}
 
-        
+@keyframes wave {
+    0% {
+        transform: rotate(0deg);
     }
+    100%{
+        transform: rotate(360deg);
+    }
+}
+
     
     </style>  
 <section class="container" >
@@ -88,12 +126,16 @@
         </div>
 
         <div class="col-12 mx-auto d-flex flex-column justify-content-center align-items-center">
-
             <p>
-                <h4 style="color: #5c63a7; font-size: 32px;">Acciones Ficha</h4>
+                <h4 style="color: #5c63a7; font-size: 32px;">Acciones </h4>
             </p>
+
             <div class="waterContaier">
+                <a target="_self"  href="{% url 'crear' %}">Crear nuevo registro de transparencia</a>
+                <a  target="_self"  href="{% url 'read' %}">Ver registro de transparencia</a>
             </div>
+
+            
         </div>
 
 

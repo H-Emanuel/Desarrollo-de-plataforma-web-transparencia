@@ -1,43 +1,59 @@
 from django.db import models
 import os
 # Create your models here.
+RECEPCION_CHOICES = [
+    ('CORREO ELECTRONICOS', 'CORREO ELECTRONICOS'),
+    ('PAPEL', 'PAPEL'),
+]
+
+RESPUESTA_PERSONA_CHOICES = [
+    ('NATURAL', 'NATURAL'),
+    ('EMPRESA', 'EMPRESA'),
+]
+
+
 def content_file_name_adjunto(instance, filename):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % ('p', ext)
-    folder = "assets_adjunto/" + str(instance.id.id)
-    return os.path.join(folder, filename)
+    return os.path.join('assets_adjunto', filename)
+
 
 class Solicitud(models.Model):
     id = models.BigAutoField(primary_key=True, unique=True)    
     # PARTE 1
-    fecha_i_t = models.DateTimeField()
-    fecha_i_au = models.DateTimeField()
-    N_transparencia = models.BigIntegerField()
+    fecha_i_t = models.DateField()
+    fecha_i_au = models.DateField()
+    N_transparencia = models.CharField(max_length=100, blank=True, default='')
 
     # PARTE 2
 
-    dirigido = models.CharField(max_length=100, blank=True, default='')
-    region = models.CharField(max_length=100, blank=True, default='')
-    recepcion = models.CharField(max_length=100, blank=True, default='')
+    dirigido = models.CharField(max_length=100, blank=True, default='Municipalidad de Valparaíso')
+    region = models.CharField(max_length=100, blank=True, default='Región de Valparaiso')
+    recepcion = models.CharField(max_length=50, blank=True, default='',choices=RECEPCION_CHOICES)
 
-    email = models.CharField(max_length=100, blank=True, default='')
-    solicitud_text = models.CharField(max_length=100, blank=True, default='')
-    observaciones = models.CharField(max_length=100, blank=True, default='')
+    email = models.CharField(max_length=150, blank=True, default='')
+    solicitud_text = models.TextField(blank=True, default='')
+    observaciones = models.TextField(blank=True, default='')
     archivo_adjunto = models.ImageField(upload_to=content_file_name_adjunto, blank=True, default='',null=True)
 
-    soporte = models.CharField(max_length=100, blank=True, default='')
-    formato = models.CharField(max_length=100, blank=True, default='')
+    soporte = models.CharField(max_length=150, blank=True, default='')
+    formato = models.CharField(max_length=150, blank=True, default='')
 
-    solicitante_inicio_seccion = models.CharField(max_length=100, blank=True, default='')
-    forma_de_recepccion = models.CharField(max_length=100, blank=True, default='')
-    otra_forma_De_entrega = models.CharField(max_length=100, blank=True, default='')
+    solicitante_inicio_seccion = models.BooleanField(default=False)
+    forma_de_recepccion = models.CharField(max_length=150, blank=True,choices=RECEPCION_CHOICES, default='')
+    otra_forma_De_entrega = models.CharField(max_length=150, blank=True, default='')
 
    # PARTE 3 
     
-    persona = models.CharField(max_length=100, blank=True, default='')
-    nombre_o_razon_social = models.CharField(max_length=100, blank=True, default='')
+    persona = models.CharField(max_length=50, blank=True, default='',choices=RESPUESTA_PERSONA_CHOICES)
+    nombre_o_razon_social = models.CharField(max_length=150, blank=True, default='')
     primer_apellido = models.CharField(max_length=100, blank=True, default='')
     segundo_apellido = models.CharField(max_length=100, blank=True, default='')
+
+    # PARTE 4
+
+    estado = models.CharField(max_length=100, blank=True, default='Sin responder')
+
 
 
     class Meta:
@@ -53,8 +69,7 @@ def content_file_name_respuesta(instance, filename):
 
 class Respuesta_solicitud(models.Model):
     id_solicitud = models.OneToOneField(Solicitud, on_delete=models.CASCADE)
-    # PARTE 1
-    solicitud_text = models.CharField(max_length=100, blank=True, default='')
+    respuesta = models.TextField(blank=True, default='')
     archivo_adjunto = models.ImageField(upload_to=content_file_name_respuesta, blank=True, default='',null=True)
 
     class Meta:
