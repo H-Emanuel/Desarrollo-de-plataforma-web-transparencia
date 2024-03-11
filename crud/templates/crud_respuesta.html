@@ -48,7 +48,20 @@
 
         <div class="accordion" id="accordionExample">
 
+            
+
           <form action="#" method='POST' enctype="multipart/form-data">
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label" for="Fecha_ingreso_DAJ"><b>Fecha Ingreso DAJ</b></label>
+                        <input type="date" class="form-control" id="Fecha_ingreso_DAJ" name="Fecha_ingreso_DAJ" placeholder="Fecha_ingreso_DAJ">
+                    </div> 
+                </div>
+            </div>
+
+
             {% csrf_token %}
             <div class="row">
                 <div class="col-12">
@@ -98,6 +111,25 @@
 {% endblock main_content %}
 
 {% block custom_js %}
-<!-- DESACTIVAR O ACTIVAR INSERT DE OTROS -->
-
+<script>
+    function obtenerFechaActual() {
+        const ahora = new Date();
+        const anio = ahora.getFullYear();
+        let mes = ahora.getMonth() + 1;
+        let dia = ahora.getDate();
+    
+        // Agregar cero delante si el mes o el día son menores que 10
+        mes = mes < 10 ? '0' + mes : mes;
+        dia = dia < 10 ? '0' + dia : dia;
+    
+        return anio + '-' + mes + '-' + dia;
+    }
+    
+    // Obtener elementos de fecha de entrada
+    const FechaingresoDAJ = document.getElementById('Fecha_ingreso_DAJ');
+    
+    // Establecer la fecha máxima permitida como la fecha actual
+    FechaingresoDAJ.setAttribute('max', obtenerFechaActual());
+    
+    </script>  
 {% endblock custom_js %}

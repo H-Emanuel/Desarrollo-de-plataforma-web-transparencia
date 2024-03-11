@@ -144,6 +144,7 @@ def vista_previa_respuesta(request, id):
     data = {
 
         'respuesta': respuesta.respuesta,
+        'fecha_daj': respuesta.fecha_daj,
         'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
 
     }
@@ -151,6 +152,8 @@ def vista_previa_respuesta(request, id):
 
 def respuesta(request, id=0):
     if request.method == 'POST':
+        fecha_daj = request.POST['Fecha_ingreso_DAJ']
+
         respuesta_text = request.POST['respuesta']
         try: 
             archivo_adjunto = request.FILES['archivo_adjunto']
@@ -162,6 +165,7 @@ def respuesta(request, id=0):
 
         # Crear una nueva instancia de Respuesta_solicitud y asignar la solicitud
         Respuesta_solicitud.objects.create(
+            fecha_daj = fecha_daj,
             id_solicitud=solicitud,  # Asignar la instancia de Solicitud
             respuesta=respuesta_text,
             archivo_adjunto=archivo_adjunto,

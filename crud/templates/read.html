@@ -151,11 +151,10 @@ previewLinks.forEach(function(link) {
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     var data = JSON.parse(xhr.responseText);
-    
                     // Construir el texto con los datos de la solicitud
-                    var previewDataText = 'Respuesta: ' + data.respuesta + '\n';
+                    var previewDataText = 'Respuesta: ' + data.respuesta + '\n'+
+                                          'Fecha DAJ: ' + data.fecha_daj + '\n';
 
-    
                     var previewDataElement = document.getElementById('previewData');
                     previewDataElement.innerText = previewDataText;
     

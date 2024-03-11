@@ -71,6 +71,7 @@ class Respuesta_solicitud(models.Model):
     id_solicitud = models.OneToOneField(Solicitud, on_delete=models.CASCADE)
     respuesta = models.TextField(blank=True, default='')
     archivo_adjunto = models.ImageField(upload_to=content_file_name_respuesta, blank=True, default='',null=True)
+    fecha_daj = models.DateField(blank=True,)
 
     class Meta:
         verbose_name = "Respuesta"
