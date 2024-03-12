@@ -1,0 +1,135 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+
+{% block main_content%}
+<style>
+    .mi-enlace {
+      padding: 12px 24px;
+      font-size: 18px;
+      border-radius: 25px;
+      background-color: #ff9800;
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease; /* Agregamos color a la transición */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Estilo al pasar el mouse por encima */
+    .mi-enlace:hover {
+      background-color: #ffba68;
+      transform: translateY(-2px);
+    }
+    
+    /* Estilo cuando se hace clic */
+    .mi-enlace:active {
+      transform: translateY(0);
+      box-shadow: none;
+      color: #fff; /* Mantenemos el color del texto como blanco al hacer clic */
+    }
+    
+
+    
+    </style>  
+<section class="container" >
+
+    <div class="row">
+        <div class="col-12">
+            <div class="p-2 mb-4 mt-3 ">
+                <div class="container-fluid py-5">
+                    <h1 style="color: rgb(0, 119, 203); font-family: sans-serif" class="display-5 fw-bold">CREACIÓN PROPUESTA DE RESPUESTA ASESORIA URBANA</h1>
+                </div>
+            </div>
+        </div>
+        
+
+
+
+        <div class="accordion" id="accordionExample">
+
+            
+
+          <form action="#" method='POST' enctype="multipart/form-data">
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label" for="Fecha_ingreso_DAJ"><b>Fecha Ingreso DAJ</b></label>
+                        <input type="date" class="form-control" id="Fecha_ingreso_DAJ" name="Fecha_ingreso_DAJ" placeholder="Fecha_ingreso_DAJ">
+                    </div> 
+                </div>
+            </div>
+
+
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label" for="respuesta"><b>Respuesta</b></label>
+                        <textarea type="text" class="form-control" id="respuesta" name="respuesta" value="" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label" for="archivo_adjunto"><b>Archivos adjuntos</b></label>
+                        <br>
+                        <br>
+
+                        <input type="file" class="form-control-file" id="archivo_adjunto" name="archivo_adjunto" value="" >
+                        
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+
+
+
+
+      <div class="row m-3">
+          <div class="col-12">
+              <button hr class="btn btn-purple" type="submit">Crear ficha nueva</button>
+          </div>
+      </div>
+      </form>
+     
+
+        </div>
+
+            
+        </div>
+      </div>
+
+    </div>
+</section>
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    function obtenerFechaActual() {
+        const ahora = new Date();
+        const anio = ahora.getFullYear();
+        let mes = ahora.getMonth() + 1;
+        let dia = ahora.getDate();
+    
+        // Agregar cero delante si el mes o el día son menores que 10
+        mes = mes < 10 ? '0' + mes : mes;
+        dia = dia < 10 ? '0' + dia : dia;
+    
+        return anio + '-' + mes + '-' + dia;
+    }
+    
+    // Obtener elementos de fecha de entrada
+    const FechaingresoDAJ = document.getElementById('Fecha_ingreso_DAJ');
+    
+    // Establecer la fecha máxima permitida como la fecha actual
+    FechaingresoDAJ.setAttribute('max', obtenerFechaActual());
+    
+    </script>  
+{% endblock custom_js %}
