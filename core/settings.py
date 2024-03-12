@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-^8^)lkkl6=hgll73oimjnz8eyzk=7_7_g(%q8+7y7ew7#c%x60
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*','https://b36f-200-50-126-98.ngrok-free.app']
+ALLOWED_HOSTS = ['*','https://b36f-200-50-126-98.ngrok-free.app','192.168.12.80']
 
 CSRF_TRUSTED_ORIGINS =['https://b36f-200-50-126-98.ngrok-free.app' ]
 # Application definition
@@ -76,19 +76,8 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#      'default': {
-#          'ENGINE': 'django.db.backends.postgresql',
-#          'NAME': 'transparencia_AU',
-#          'USER': 'transparencia_AU',
-#          'PASSWORD': 'munivalpoficha2022',
-#          'HOST': 'localhost',
-#          'PORT': '5432',
-#      }
-#  }
-
 DATABASES = {
-    'default': {
+     'default': {
          'ENGINE': 'django.db.backends.postgresql',
          'NAME': 'transparencia_AU',
          'USER': 'postgres',
@@ -97,6 +86,17 @@ DATABASES = {
          'PORT': '5432',
      }
  }
+
+# DATABASES = {
+#     'default': {
+#          'ENGINE': 'django.db.backends.postgresql',
+#          'NAME': 'transparencia_AU',
+#          'USER': 'transparencia_AU',
+#          'PASSWORD': 'transparencia2024',
+#          'HOST': 'localhost',
+#          'PORT': '5432',
+#      }
+#  }
 
 
 # Password validation
