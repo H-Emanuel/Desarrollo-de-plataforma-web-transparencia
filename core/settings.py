@@ -90,8 +90,8 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
          'ENGINE': 'django.db.backends.postgresql',
-         'NAME': 'transparencia_AU',
-         'USER': 'transparencia_AU',
+         'NAME': 'transparencia_au',
+         'USER': 'transparencia_au',
          'PASSWORD': 'transparencia2024',
          'HOST': 'localhost',
          'PORT': '5432',
