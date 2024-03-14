@@ -3,7 +3,17 @@
 {% load static %}
 
 {% block main_content %}
+<style>
 
+td.invisible {
+    display: none;
+}
+
+th.invisible {
+    display: none;
+}
+
+</style>
 <section class="container">
     <div class="row">
         <div class="col-12 pt-3">
@@ -15,6 +25,8 @@
                         <th>N° transparencia</th>
                         <th>Estado</th>
                         <th>Acciones</th>
+                        <th class="invisible">Solicitud</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -24,7 +36,7 @@
                             <td>{{ Solicitud.fecha_i_t }}</td>
                             <td>{{ Solicitud.N_transparencia }}</td>
                             <td>{{ Solicitud.estado }}</td>
-                
+
 
                             <td> 
                                 <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}">Ver</a>
@@ -40,6 +52,8 @@
                              
 
                             </td>
+                            <td class="invisible">{{ Solicitud.solicitud_text }}</td>
+
                         </tr>
                     {% empty %}
                         <tr>
@@ -47,6 +61,8 @@
                             <td>No hay datos</td>
                             <td>No hay datos</td>
                             <td>No hay datos</td>
+                            <td>No hay datos</td>
+
                         </tr>
                     {% endfor %}
                 </tbody>
