@@ -133,12 +133,11 @@
                         <label class="form-label" for="recepcion"><b>Vía de recepción de solicitud</b></label>
 
                         <select class="form-control" id="recepcion" name="recepcion" >
-                            <option value = " " selected></option>
+                            <option value = "{{ recepcion.RECEPCION_CHOICES }}" selected></option>
                             {% for recepciones in OPTIONS.RECEPCION_CHOICES %}
                                 <option value="{{ recepciones.0 }}">{{ recepciones.1 }}</option>
                             {% endfor %}
                         </select>         
-                            <!-- DESACTIVAR O ACTIVAR INSERT DE OTROS -->
 
                     </div>
                 </div>
@@ -242,7 +241,14 @@
                 <div class="col-12">
                     <div class="form-group">
                         <label class="form-label" for="forma_de_recepccion"><b>Forma de recepccion de la solicitud</b></label>
-                        <input type="text" class="form-control" id="forma_de_recepccion" name="forma_de_recepccion" value="" >
+
+                        <select class="form-control" id="forma_de_recepccion" name="forma_de_recepccion" >
+                            <option value = "{{ forma_de_recepccion.RECEPCION_CHOICES }}" selected></option>
+                            {% for forma_de_recepcciones in OPTIONS.RECEPCION_CHOICES %}
+                                <option value="{{ forma_de_recepcciones.0 }}">{{ forma_de_recepcciones.1 }}</option>
+                            {% endfor %}
+                        </select>         
+
                     </div>
                 </div>
             </div>

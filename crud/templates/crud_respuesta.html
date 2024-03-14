@@ -50,12 +50,12 @@
 
             
 
-          <form action="#" method='POST' enctype="multipart/form-data">
+          <form action="{% url 'respuesta' solicitud.id %}" method='POST' enctype="multipart/form-data">
 
             <div class="row">
                 <div class="col-12">
                     <div class="form-group">
-                        <label class="form-label" for="Fecha_ingreso_DAJ"><b>Fecha Ingreso DAJ</b></label>
+                        <label class="form-label" for="Fecha_ingreso_DAJ"><b>Fecha de respuesta a DAJ</b></label>
                         <input type="date" class="form-control" id="Fecha_ingreso_DAJ" name="Fecha_ingreso_DAJ" placeholder="Fecha_ingreso_DAJ">
                     </div> 
                 </div>
@@ -80,12 +80,18 @@
                         <label class="form-label" for="archivo_adjunto"><b>Archivos adjuntos</b></label>
                         <br>
                         <br>
-
+            
                         <input type="file" class="form-control-file" id="archivo_adjunto" name="archivo_adjunto" value="" >
-                        
+                        <br><br>
+                        <input type="file" class="form-control-file mt-2" id="archivo_adjunto_2" name="archivo_adjunto_2" value="" >
+                        <br><br>
+                        <input type="file" class="form-control-file mt-2" id="archivo_adjunto_3" name="archivo_adjunto_3" value="" >
                     </div>
                 </div>
             </div>
+            
+            
+            
             <br>
             <br>
 
@@ -94,7 +100,7 @@
 
       <div class="row m-3">
           <div class="col-12">
-              <button hr class="btn btn-purple" type="submit">Crear ficha nueva</button>
+              <button hr class="btn btn-purple" type="submit">Guardar Respuesta</button>
           </div>
       </div>
       </form>

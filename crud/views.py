@@ -7,16 +7,18 @@ from django.contrib.auth.models import User
 from .models import *
 from datetime import datetime
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 
 
 @login_required(login_url='/login/')
 def home(request):
     OPTIONS = {
-        # 'PLAN_CERRO_POBLACION': PLAN_CERRO_POBLACION,
         'RECEPCION_CHOICES': RECEPCION_CHOICES,
         'RESPUESTA_PERSONA_CHOICES': RESPUESTA_PERSONA_CHOICES,
         }
     data = {'OPTIONS': OPTIONS,}
+
+
     if request.method == "POST":
             fecha_ingreso_t = datetime.strptime(request.POST['Fecha_ingreso_t'], '%Y-%m-%d').date()
             fecha_ingreso_au = datetime.strptime(request.POST['Fecha_ingreso_AU'], '%Y-%m-%d').date()
@@ -25,7 +27,7 @@ def home(request):
 
             dirigido = "Municipalidad de Valparaíso"
             region = "Región de Valparaiso"
-            recepcion = request.POST['recepcion'],
+            recepciones = request.POST['recepcion']
             email = request.POST['e_email']
             solicitud_text = request.POST['solicitud_text']
             observaciones = request.POST['observaciones']
@@ -52,6 +54,8 @@ def home(request):
             nombre_o_razon_social = request.POST['nombre_o_razon_social']
             primer_apellido = request.POST['primer_apellido']
             segundo_apellido = request.POST['segundo_apellido']
+            print(persona)
+
 
             Solicitud.objects.create(
                   
@@ -61,7 +65,7 @@ def home(request):
 
                 dirigido = dirigido,
                 region =region,
-                recepcion =recepcion,
+                recepcion =recepciones,
                 email = email,
                 solicitud_text = solicitud_text,
                 observaciones = observaciones,
@@ -146,11 +150,19 @@ def vista_previa_respuesta(request, id):
         'respuesta': respuesta.respuesta,
         'fecha_daj': respuesta.fecha_daj,
         'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
+        'archivo_adjunto_url_2': respuesta.archivo_adjunto_2.url if respuesta.archivo_adjunto_2 else None,
+        'archivo_adjunto_url_3': respuesta.archivo_adjunto_3.url if respuesta.archivo_adjunto_3 else None,
+
+
 
     }
     return JsonResponse(data)
 
 def respuesta(request, id=0):
+    solicitud = get_object_or_404(Solicitud, id=id)
+    data = {
+        'solicitud': solicitud
+    }
     if request.method == 'POST':
         fecha_daj = request.POST['Fecha_ingreso_DAJ']
 
@@ -160,8 +172,16 @@ def respuesta(request, id=0):
         except:
             archivo_adjunto = None  # Utiliza None en lugar de una cadena vacía
 
-        # Obtener la instancia de Solicitud correspondiente al ID
-        solicitud = Solicitud.objects.get(id=id)
+        try: 
+            archivo_adjunto_2 = request.FILES['archivo_adjunto_2']
+        except:
+            archivo_adjunto_2 = None  # Utiliza None en lugar de una cadena vacía
+
+
+        try: 
+            archivo_adjunto_3 = request.FILES['archivo_adjunto_3']
+        except:
+            archivo_adjunto_3 = None  # Utiliza None en lugar de una cadena vacía
 
         # Crear una nueva instancia de Respuesta_solicitud y asignar la solicitud
         Respuesta_solicitud.objects.create(
@@ -169,6 +189,8 @@ def respuesta(request, id=0):
             id_solicitud=solicitud,  # Asignar la instancia de Solicitud
             respuesta=respuesta_text,
             archivo_adjunto=archivo_adjunto,
+            archivo_adjunto_2=archivo_adjunto_2,
+            archivo_adjunto_3=archivo_adjunto_3,
         )
 
         # Actualizar el estado de la solicitud a "RESPONDIDA"
@@ -177,4 +199,4 @@ def respuesta(request, id=0):
 
         return redirect('read')
     
-    return render(request, 'crud_respuesta.html',)
+    return render(request, 'crud_respuesta.html',data)

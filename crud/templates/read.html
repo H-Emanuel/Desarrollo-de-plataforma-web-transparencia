@@ -160,8 +160,16 @@ previewLinks.forEach(function(link) {
     
                     // Si hay un archivo adjunto, agregar enlace de descarga
                     if (data.archivo_adjunto_url) {
-                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Adjunto</a>';
+                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Adjunto 1</a>';
                     }
+                    if (data.archivo_adjunto_url_2) {
+                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url_2 + '" download>Descargar Archivo Adjunto 2</a>';
+                    }
+
+                    if (data.archivo_adjunto_url_3) {
+                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto 3</a>';
+                    }
+
     
                     $('#previewModal').modal('show'); // Mostrar el modal utilizando jQuery
                 }

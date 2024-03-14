@@ -64,14 +64,17 @@ class Solicitud(models.Model):
 def content_file_name_respuesta(instance, filename):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % ('p', ext)
-    folder = "assets_respuesta/" + str(instance.id.id)
+    folder = "assets_respuesta/" + str(instance.id_solicitud.id)
     return os.path.join(folder, filename)
 
-class Respuesta_solicitud(models.Model):
+
+class Respuesta_solicitud(models.Model): 
     id_solicitud = models.OneToOneField(Solicitud, on_delete=models.CASCADE)
     respuesta = models.TextField(blank=True, default='')
-    archivo_adjunto = models.ImageField(upload_to=content_file_name_respuesta, blank=True, default='',null=True)
-    fecha_daj = models.DateField(blank=True,)
+    archivo_adjunto = models.ImageField(upload_to=content_file_name_respuesta, blank=True, default='', null=True)
+    archivo_adjunto_2 = models.ImageField(upload_to=content_file_name_respuesta, blank=True, default='', null=True)
+    archivo_adjunto_3 = models.ImageField(upload_to=content_file_name_respuesta, blank=True, default='', null=True)
+    fecha_daj = models.DateField(blank=True)
 
     class Meta:
         verbose_name = "Respuesta"
