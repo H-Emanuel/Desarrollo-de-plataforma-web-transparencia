@@ -13,6 +13,27 @@ th.invisible {
     display: none;
 }
 
+.ellipses {
+  display: inline;
+}
+
+.contenido-oculto {
+  display: none;
+}
+
+.mostrar-mas {
+    color: blue;
+    cursor: pointer;
+}
+
+.mostrar-mas:hover {
+    text-decoration: underline;
+}
+.resaltado {
+    background-color: orange;
+}
+
+
 </style>
 <section class="container">
     <div class="row">
@@ -26,6 +47,7 @@ th.invisible {
                         <th>Estado</th>
                         <th>Acciones</th>
                         <th class="invisible">Solicitud</th>
+                        <th >Respuesta</th>
 
                     </tr>
                 </thead>
@@ -53,6 +75,9 @@ th.invisible {
 
                             </td>
                             <td class="invisible">{{ Solicitud.solicitud_text }}</td>
+                            <td class="respuesta"><div class="contenido-respuesta">{{ respuesta.respuesta }}</div></td>
+
+
 
                         </tr>
                     {% empty %}
@@ -90,18 +115,63 @@ th.invisible {
 
 {% block custom_js %}
 <script>
-    document.getElementById("tabla_fichas").style.display = "none";
-    $(document).ready( function () {
-        $('#tabla_fichas').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.12.1/i18n/es-CL.json'
-            }, 
-            initComplete: function () {
-                $("#tabla_fichas").show();
+$(document).ready(function () {
+    var tabla = $('#tabla_fichas').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.12.1/i18n/es-CL.json'
+        },
+        initComplete: function () {
+            $("#tabla_fichas").show();
+            $('.contenido-respuesta').each(function () {
+                var contenido = $(this).text().trim();
+                if (contenido.length > 150) {
+                    var recortado = contenido.substring(0, 150);
+                    var restante = contenido.substring(150);
+                    $(this).html(recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>');
+                }
+            });
+
+            // Event listeners para mostrar y ocultar más texto
+            $('.enlace-mostrar').click(function (e) {
+                e.preventDefault();
+                $(this).closest('.contenido-respuesta').find('.texto-restante').show();
+                $(this).closest('.mostrar-mas').hide();
+            });
+
+            $('.enlace-ocultar').click(function (e) {
+                e.preventDefault();
+                $(this).closest('.contenido-respuesta').find('.texto-restante').hide();
+                $(this).closest('.contenido-respuesta').find('.mostrar-mas').show();
+            });
+        },
+        // rowCallback para resaltar la palabra buscada
+        "rowCallback": function (row, data, index) {
+            var searchTerm = $('#tabla_fichas_filter input').val().trim();
+            if (searchTerm !== '') {
+                var regex = new RegExp('(' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')', 'ig');
+                $(row).find('.contenido-respuesta').each(function() {
+                    $(this).html($(this).text().replace(regex, '<span class="resaltado">$1</span>'));
+                });
+            } else {
+                $(row).find('.contenido-respuesta').each(function() {
+                    $(this).find('.resaltado').contents().unwrap();
+                });
             }
-        });
-    } );
+        }
+    });
+
+    // Filtrar la tabla cuando se realiza una búsqueda
+    $('#tabla_fichas_filter input').on('keyup', function () {
+        tabla.search(this.value).draw();
+    });
+});
+
+
+
+
+
 </script>
+
 <script>
 var previewLinks = document.querySelectorAll('.preview-link');
 previewLinks.forEach(function(link) {
@@ -193,8 +263,41 @@ previewLinks.forEach(function(link) {
             xhr.send();
         });
     });
-    </script>
-    
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var respuestas = document.querySelectorAll(".respuesta");
+        respuestas.forEach(function(respuesta) {
+            var contenido = respuesta.textContent.trim();
+            if (contenido.length > 150) {
+                var recortado = contenido.substring(0, 150);
+                var restante = contenido.substring(150);
+                respuesta.innerHTML = recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>';
+            }
+        });
+
+        // Agrega event listeners para mostrar y ocultar más texto
+        document.querySelectorAll('.enlace-mostrar').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var parent = e.target.closest('.respuesta');
+                parent.querySelector('.texto-restante').style.display = 'inline';
+                e.target.closest('.mostrar-mas').style.display = 'none';
+            });
+        });
+
+        document.querySelectorAll('.enlace-ocultar').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var parent = e.target.closest('.respuesta');
+                parent.querySelector('.texto-restante').style.display = 'none';
+                parent.querySelector('.mostrar-mas').style.display = 'inline';
+            });
+        });
+    });
+
+
+</script>
 
     
 {% endblock custom_js %}
