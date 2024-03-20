@@ -45,7 +45,7 @@ th.invisible {
                         <th>Fecha</th>
                         <th>N° transparencia</th>
                         <th>Estado</th>
-                        <th>Acciones</th>
+                        <th style="width: 280px;">Acciones</th>
                         <th class="invisible">Solicitud</th>
                         <th >Respuesta</th>
 
@@ -68,12 +68,16 @@ th.invisible {
 
                                 {% if Solicitud.estado == "Respondida"  %}
                                     <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}">Ver Propuesta respuesta</a>
+                                    <br>
+                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px;">P-Editar Propuesta respuesta</a>
+
                                 {% endif %}
 
                                 
                              
 
                             </td>
+
                             <td class="invisible">{{ Solicitud.solicitud_text }}</td>
                             <td class="respuesta"><div class="contenido-respuesta">{{ respuesta.respuesta }}</div></td>
 
