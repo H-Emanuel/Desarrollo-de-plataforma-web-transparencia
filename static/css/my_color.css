@@ -11,10 +11,10 @@
 
 /* Estilos específicos para el botón púrpura */
 .btn-purple {
-    background-color: #989898; /* Púrpura */
+    background-color: #414141; /* Púrpura */
 }
 
 /* Cambio de color al pasar el mouse */
 .btn:hover {
-    background-color: #989898; /* Púrpura más claro */
+    background-color: #414141; /* Púrpura más claro */
 }
