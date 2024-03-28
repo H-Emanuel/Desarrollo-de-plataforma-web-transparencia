@@ -38,12 +38,14 @@ th.invisible {
 <section class="container">
     <div class="row">
         <div class="col-12 pt-3">
-            <table id="tabla_fichas" class="display table table-striped table-bordered table-sm" style="width:100%">
+            <table id="tabla_fichas" class="display table table-striped table-bordered table-sm" style="width:100%" >
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Fecha</th>
-                        <th>N° transparencia</th>
+                        <th>Fecha de ingreso</th>
+                        <th>Fecha de AU</th>
+
+                        <th>Folio</th>
                         <th>Estado</th>
                         <th style="width: 280px;">Acciones</th>
                         <th class="invisible">Solicitud</th>
@@ -56,6 +58,8 @@ th.invisible {
                     <tr>
                             <td>{{ Solicitud.id }}</td>
                             <td>{{ Solicitud.fecha_i_t }}</td>
+                            <td>{{ Solicitud.fecha_i_au }}</td>
+
                             <td>{{ Solicitud.N_transparencia }}</td>
                             <td>{{ Solicitud.estado }}</td>
 
@@ -102,8 +106,8 @@ th.invisible {
         <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header" style="background-color: #707eff;">
-                    <h5 class="modal-title" id="previewModalLabel">Vista previa de solicitud</h5>
+                <div class="modal-header" style="background-color: #282d4a;">
+                    <h5 class="modal-title" style="color: white;" id="previewModalLabel">Vista previa de solicitud</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="previewData">
