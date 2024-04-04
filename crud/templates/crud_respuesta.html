@@ -28,7 +28,26 @@
       box-shadow: none;
       color: #fff; /* Mantenemos el color del texto como blanco al hacer clic */
     }
-    
+    .custom-file-upload {
+    display: inline-block;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: 2px solid #5b5b5b; /* Color de borde */
+    background-color: #3e3e3e; /* Color de fondo */
+    color: #fff; /* Color de texto */
+    border-radius: 5px;
+}
+
+.custom-file-upload input[type="file"] {
+    display: none;
+}
+
+#nombre_archivo_seleccionado {
+    display: none;
+    margin-left: 10px;
+    font-style: italic;
+}
+
 
     
     </style>  
@@ -81,11 +100,25 @@
                         <br>
                         <br>
             
-                        <input type="file" class="form-control-file" id="archivo_adjunto" name="archivo_adjunto" value="" >
+                        <label for="archivo_adjunto" class="custom-file-upload">
+                            <input type="file" id="archivo_adjunto" name="archivo_adjunto" onchange="mostrarNombreArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1')">
+                            1. Folio (consulta desde consejo transparencia)
+                        </label>
+                        <span id="nombre_archivo_seleccionado_1"></span>
                         <br><br>
-                        <input type="file" class="form-control-file mt-2" id="archivo_adjunto_2" name="archivo_adjunto_2" value="" >
+                        <label for="archivo_adjunto_2" class="custom-file-upload">
+                            <input type="file" id="archivo_adjunto_2" name="archivo_adjunto_2" onchange="mostrarNombreArchivo('archivo_adjunto_2', 'nombre_archivo_seleccionado_2')">
+                            2. Propuesta de respuesta (Respaldo)
+                        </label>
+                        <span id="nombre_archivo_seleccionado_2"></span>
                         <br><br>
-                        <input type="file" class="form-control-file mt-2" id="archivo_adjunto_3" name="archivo_adjunto_3" value="" >
+                        <label for="archivo_adjunto_3" class="custom-file-upload">
+                            <input type="file" id="archivo_adjunto_3" name="archivo_adjunto_3" onchange="mostrarNombreArchivo('archivo_adjunto_3', 'nombre_archivo_seleccionado_3')">
+                            3. Adjuntos (plano,decreto,pdf) 
+                        </label>
+                        <span id="nombre_archivo_seleccionado_3"></span>
+                        
+
                     </div>
                 </div>
             </div>
@@ -137,5 +170,17 @@
     // Establecer la fecha máxima permitida como la fecha actual
     FechaingresoDAJ.setAttribute('max', obtenerFechaActual());
     
+    function mostrarNombreArchivo(inputId, spanId) {
+        var input = document.getElementById(inputId);
+        var nombreArchivo = document.getElementById(spanId);
+        
+        if (input.files.length > 0) {
+            nombreArchivo.style.display = 'inline';
+            nombreArchivo.textContent = input.files[0].name;
+        } else {
+            nombreArchivo.style.display = 'none';
+        }
+}
+
     </script>  
 {% endblock custom_js %}

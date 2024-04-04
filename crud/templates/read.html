@@ -44,7 +44,7 @@ th.invisible {
                         <th>ID</th>
                         <th>Fecha de ingreso</th>
                         <th>Fecha de AU</th>
-
+                        <th>Nombre y Apellido O Razón Social</th>
                         <th>Folio</th>
                         <th>Estado</th>
                         <th style="width: 280px;">Acciones</th>
@@ -59,7 +59,7 @@ th.invisible {
                             <td>{{ Solicitud.id }}</td>
                             <td>{{ Solicitud.fecha_i_t }}</td>
                             <td>{{ Solicitud.fecha_i_au }}</td>
-
+                            <td>{{ Solicitud.nombre_o_razon_social }}  {{ Solicitud.primer_apellido }}</td>
                             <td>{{ Solicitud.N_transparencia }}</td>
                             <td>{{ Solicitud.estado }}</td>
 
@@ -254,14 +254,14 @@ previewLinks.forEach(function(link) {
     
                     // Si hay un archivo adjunto, agregar enlace de descarga
                     if (data.archivo_adjunto_url) {
-                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Adjunto 1</a>';
+                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Folio</a>';
                     }
                     if (data.archivo_adjunto_url_2) {
-                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url_2 + '" download>Descargar Archivo Adjunto 2</a>';
+                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url_2 + '" download>Descargar Archivo Propuesta de respuesta</a>';
                     }
 
                     if (data.archivo_adjunto_url_3) {
-                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto 3</a>';
+                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos,PDF, etc)</a>';
                     }
 
     
