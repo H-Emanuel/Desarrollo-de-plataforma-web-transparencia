@@ -32,19 +32,23 @@ th.invisible {
 .resaltado {
     background-color: orange;
 }
-
-
+th {
+        font-size: 13px; /* Puedes ajustar el tamaño de la fuente según tu preferencia */
+        font-weight: bold; /* Opcional: hacer el texto en negrita */
+    }
 </style>
 <section class="container">
+    <br>
     <div class="row">
-        <div class="col-12 pt-3">
-            <table id="tabla_fichas" class="display table table-striped table-bordered table-sm" style="width:100%" >
-                <thead>
+        
+        <div style="display: flex; justify-content: center; margin: 0 auto;">
+            <table id="tabla_fichas" class="display table table-striped table-bordered table-sm" style="width: 110%;">
+                    <thead>
                     <tr>
                         <th>ID</th>
                         <th>Fecha de Ingreso</th>
                         <th>Fecha de Ingreso a AU</th>
-                        <th>Nombre y Apellido O Razón Social</th>
+                        <th style="width: 150px;">Nombre y Apellido O Razón Social</th>
                         <th>N° Folio</th>
                         <th>Estado</th>
                         <th style="width: 280px;">Acciones</th>
@@ -65,23 +69,18 @@ th.invisible {
 
 
                             <td> 
-                                <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}">Ver Solicitud</a>
-                                {% if Solicitud.estado == "Sin responder"  %}
-
-                                    <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple">Propuesta de respuesta</a>
+                                <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Solicitud</a>
+                            
+                                {% if Solicitud.estado == "Sin responder" %}
+                                    <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de respuesta</a>
                                 {% endif %}
-                               
-                                {% if Solicitud.estado == "Respondida"  %}
-                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}">Ver Propuesta Respuesta</a>
-                                    
-                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px;">P-Editar Propuesta respuesta</a>
-
-                                {% endif %}
-
                                 
-                             
-
+                                {% if Solicitud.estado == "Respondida" %}
+                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
+                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Propuesta respuesta</a>
+                                {% endif %}
                             </td>
+                            
 
                             <td class="invisible">{{ Solicitud.solicitud_text }}</td>
                             <td class="respuesta"><div class="contenido-respuesta">{{ respuesta.respuesta }}</div></td>
@@ -129,13 +128,14 @@ $(document).ready(function () {
         language: {
             url: '//cdn.datatables.net/plug-ins/1.12.1/i18n/es-CL.json'
         },
+        
         initComplete: function () {
             $("#tabla_fichas").show();
             $('.contenido-respuesta').each(function () {
                 var contenido = $(this).text().trim();
-                if (contenido.length > 150) {
-                    var recortado = contenido.substring(0, 150);
-                    var restante = contenido.substring(150);
+                if (contenido.length > 250) {
+                    var recortado = contenido.substring(0, 250);
+                    var restante = contenido.substring(250);
                     $(this).html(recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>');
                 }
             });
@@ -189,7 +189,7 @@ previewLinks.forEach(function(link) {
 
         var solicitudId = this.getAttribute('data-id'); // Obtener el ID de la solicitud
 
-        // Hacer una solicitud AJAX a la vista de Django para obtener los datos de la solicitud
+        // Hacer una solicitud AJAX a la vista 0de Django para obtener los datos de la solicitud
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/accion/vista_previa_solicitud/' + solicitudId, true);
         xhr.onreadystatechange = function() {
@@ -278,9 +278,9 @@ previewLinks.forEach(function(link) {
         var respuestas = document.querySelectorAll(".respuesta");
         respuestas.forEach(function(respuesta) {
             var contenido = respuesta.textContent.trim();
-            if (contenido.length > 150) {
-                var recortado = contenido.substring(0, 150);
-                var restante = contenido.substring(150);
+            if (contenido.length > 250) {
+                var recortado = contenido.substring(0, 250);
+                var restante = contenido.substring(250);
                 respuesta.innerHTML = recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>';
             }
         });
