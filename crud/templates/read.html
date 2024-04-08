@@ -42,10 +42,10 @@ th.invisible {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Fecha de ingreso</th>
-                        <th>Fecha de AU</th>
+                        <th>Fecha de Ingreso</th>
+                        <th>Fecha de Ingreso a AU</th>
                         <th>Nombre y Apellido O Razón Social</th>
-                        <th>Folio</th>
+                        <th>N° Folio</th>
                         <th>Estado</th>
                         <th style="width: 280px;">Acciones</th>
                         <th class="invisible">Solicitud</th>
@@ -65,14 +65,15 @@ th.invisible {
 
 
                             <td> 
-                                <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}">Ver</a>
+                                <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}">Ver Solicitud</a>
                                 {% if Solicitud.estado == "Sin responder"  %}
+
                                     <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple">Propuesta de respuesta</a>
                                 {% endif %}
-
+                               
                                 {% if Solicitud.estado == "Respondida"  %}
-                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}">Ver Propuesta respuesta</a>
-                                    <br>
+                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}">Ver Propuesta Respuesta</a>
+                                    
                                     <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px;">P-Editar Propuesta respuesta</a>
 
                                 {% endif %}
@@ -106,7 +107,7 @@ th.invisible {
         <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header" style="background-color: #282d4a;">
+                <div class="modal-header" style="background-color: #c2c5c3;">
                     <h5 class="modal-title" style="color: white;" id="previewModalLabel">Vista previa de solicitud</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
