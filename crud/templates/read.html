@@ -55,12 +55,13 @@ th {
                         <th class="invisible">Solicitud</th>
                         <th >Respuesta</th>
                         <th >Fecha Limite</th>
+                        <th >Departamento</th>
 
 
                     </tr>
                 </thead>
                 <tbody>
-                    {% for Solicitud, respuesta in solicitud_respuesta_list %}
+                    {% for Solicitud, respuesta,Departamento in solicitud_respuesta_list %}
                     <tr>
                             <td>{{ Solicitud.id }}</td>
                             <td>{{ Solicitud.fecha_i_t }}</td>
@@ -96,6 +97,15 @@ th {
                             <td class="invisible">{{ Solicitud.solicitud_text }}</td>
                             <td class="respuesta">{{ respuesta.respuesta }}</td>
                             <td>{{ Solicitud.fecha_limite }}</td>
+                            {% if departamento.nombre_departamento == 'ADMIN'%}
+
+                            <td>{{ Solicitud.Departamento_admin }}</td>
+
+                            {% else %}
+
+                                <td>{{ Departamento.nombre_departamento }}</td>
+
+                            {% endif %}
 
 
 

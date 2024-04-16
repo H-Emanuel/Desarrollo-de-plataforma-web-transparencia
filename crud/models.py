@@ -19,6 +19,12 @@ DEPARTAMENTO_CHOICES = [
     ('ADMIN', 'ADMIN'),
 ]
 
+
+DEPARTAMENTO_CHOICES_2 = [
+    ('DEPARTAMENTO SIG', 'DEPARTAMENTO SIG'),
+    ('ASESORIA URBANA', 'ASESORIA URBANA'),
+]
+
 def content_file_name_adjunto(instance, filename):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % ('p', ext)
@@ -58,10 +64,11 @@ class Solicitud(models.Model):
     primer_apellido = models.CharField(max_length=100, blank=True, default='')
     segundo_apellido = models.CharField(max_length=100, blank=True, default='')
 
-    # PARTE 4
+    # PARTE 4 - ADMIN EXCLUSIVOS
 
     estado = models.CharField(max_length=100, blank=True, default='Sin responder')
     fecha_limite = models.DateField()
+    Departamento_admin = models.CharField(max_length=150, blank=True, default='',choices=DEPARTAMENTO_CHOICES_2, null=True) 
 
 
     class Meta:

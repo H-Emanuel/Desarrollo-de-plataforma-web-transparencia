@@ -12,11 +12,19 @@ from django.shortcuts import get_object_or_404
 
 @login_required(login_url='/login/')
 def home(request):
+    user = request.user
+    departamento_usuario = Departamento.objects.filter(id_usuario=user).first()
+
     OPTIONS = {
         'RECEPCION_CHOICES': RECEPCION_CHOICES,
         'RESPUESTA_PERSONA_CHOICES': RESPUESTA_PERSONA_CHOICES,
+        'DEPARTAMENTO_CHOICES': DEPARTAMENTO_CHOICES_2,
+
         }
-    data = {'OPTIONS': OPTIONS,}
+    
+
+    data = {'OPTIONS': OPTIONS,
+            'departamento': departamento_usuario,}
 
 
     if request.method == "POST":
@@ -55,6 +63,7 @@ def home(request):
             primer_apellido = request.POST['primer_apellido']
             segundo_apellido = request.POST['segundo_apellido']
             fecha_limite = calcular_fecha_limite()
+            Departamento_admin = request.POST['departamento_admin']
 
 
             Solicitud.objects.create(
@@ -88,7 +97,9 @@ def home(request):
 
             # PARTE 4
                 id_usuario = request.user,
-                fecha_limite = fecha_limite
+                fecha_limite = fecha_limite,
+                Departamento_admin = Departamento_admin
+                
             )
             return redirect('home')
 
@@ -104,7 +115,8 @@ def read(request):
         solicitud_respuesta_list = []
         for solicitud in Solicitud.objects.all():
             respuesta = Respuesta_solicitud.objects.filter(id_solicitud=solicitud).first()
-            solicitud_respuesta_list.append((solicitud, respuesta))
+            departamento_origen = Departamento.objects.filter(id_usuario=solicitud.id_usuario).first()
+            solicitud_respuesta_list.append((solicitud, respuesta, departamento_origen))
 
     else:
         # Si el usuario no es del departamento 'ADMIN', filtrar por usuario
@@ -116,14 +128,16 @@ def read(request):
             except Respuesta_solicitud.DoesNotExist:
                 # Si no hay respuesta asociada, asignar None
                 respuesta = None
-            solicitud_respuesta_list.append((solicitud, respuesta))
+            departamento_origen = Departamento.objects.filter(id_usuario=solicitud.id_usuario).first()
+            solicitud_respuesta_list.append((solicitud, respuesta, departamento_origen))
 
     data = {
         'solicitud_respuesta_list': solicitud_respuesta_list,
-        'departamento':departamento_usuario,
+        'departamento': departamento_usuario,
     }
 
     return render(request, 'read.html', data)
+
 def calcular_fecha_limite():
     # Obtener la fecha actual
     fecha_actual = datetime.now().date()
