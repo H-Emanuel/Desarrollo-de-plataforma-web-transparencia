@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from .models import *
-from datetime import datetime
+from datetime import datetime,timedelta
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
@@ -54,7 +54,7 @@ def home(request):
             nombre_o_razon_social = request.POST['nombre_o_razon_social']
             primer_apellido = request.POST['primer_apellido']
             segundo_apellido = request.POST['segundo_apellido']
-            print(persona)
+            fecha_limite = calcular_fecha_limite()
 
 
             Solicitud.objects.create(
@@ -86,33 +86,59 @@ def home(request):
                 primer_apellido = primer_apellido,
                 segundo_apellido = segundo_apellido,
 
+            # PARTE 4
+                id_usuario = request.user,
+                fecha_limite = fecha_limite
             )
             return redirect('home')
 
     return render(request, 'home.html',data)
 
+@login_required  # Asegura que el usuario esté autenticado para acceder a esta vista
 def read(request):
-    Solicitud_read = Solicitud.objects.all()
-    respuesta_dict = {}  # Diccionario para almacenar las respuestas
+    user = request.user
+    departamento_usuario = Departamento.objects.filter(id_usuario=user).first()
 
-    # Iterar sobre cada objeto Solicitud en el queryset
-    for solicitud in Solicitud_read:
-        try:
-            # Intentar obtener la respuesta asociada a esta Solicitud
-            respuesta = Respuesta_solicitud.objects.get(id_solicitud=solicitud)
-            respuesta_dict[solicitud.id] = respuesta  # Agregar la respuesta al diccionario
-        except Respuesta_solicitud.DoesNotExist:
-            # Si no hay respuesta asociada, asignar None
-            respuesta_dict[solicitud.id] = None
+    if departamento_usuario and departamento_usuario.nombre_departamento == 'ADMIN':
+        # Si el usuario es del departamento 'ADMIN', mostrar todas las solicitudes y respuestas
+        solicitud_respuesta_list = []
+        for solicitud in Solicitud.objects.all():
+            respuesta = Respuesta_solicitud.objects.filter(id_solicitud=solicitud).first()
+            solicitud_respuesta_list.append((solicitud, respuesta))
 
-    # Combinar los datos de Solicitud_read y respuesta_dict en una lista de tuplas
-    solicitud_respuesta_list = [(solicitud, respuesta_dict.get(solicitud.id)) for solicitud in Solicitud_read]
+    else:
+        # Si el usuario no es del departamento 'ADMIN', filtrar por usuario
+        solicitud_respuesta_list = []
+        for solicitud in Solicitud.objects.filter(id_usuario=user):
+            try:
+                # Intentar obtener la respuesta asociada a esta Solicitud
+                respuesta = Respuesta_solicitud.objects.get(id_solicitud=solicitud)
+            except Respuesta_solicitud.DoesNotExist:
+                # Si no hay respuesta asociada, asignar None
+                respuesta = None
+            solicitud_respuesta_list.append((solicitud, respuesta))
 
     data = {
-        'solicitud_respuesta_list': solicitud_respuesta_list,  # Pasar la lista combinada al contexto
+        'solicitud_respuesta_list': solicitud_respuesta_list,
+        'departamento':departamento_usuario,
     }
 
     return render(request, 'read.html', data)
+def calcular_fecha_limite():
+    # Obtener la fecha actual
+    fecha_actual = datetime.now().date()
+
+    # Contador para llevar la cuenta de los días hábiles
+    dias_habiles = 0
+
+    # Bucle para encontrar la fecha límite
+    while dias_habiles < 13:
+        fecha_actual += timedelta(days=1)
+        # Si es sábado o domingo, no se cuentan como días hábiles
+        if fecha_actual.weekday() not in [5, 6]:
+            dias_habiles += 1
+
+    return fecha_actual
 
 
     

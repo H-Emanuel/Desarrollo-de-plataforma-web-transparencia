@@ -47,13 +47,15 @@ th {
                     <tr>
                         <th>ID</th>
                         <th>Fecha de Ingreso</th>
-                        <th>Fecha de Ingreso a AU</th>
+                        <th>Fecha de Ingreso a SECPLA</th>
                         <th style="width: 150px;">Nombre y Apellido O Razón Social</th>
                         <th>N° Folio</th>
                         <th>Estado</th>
                         <th style="width: 280px;">Acciones</th>
                         <th class="invisible">Solicitud</th>
                         <th >Respuesta</th>
+                        <th >Fecha Limite</th>
+
 
                     </tr>
                 </thead>
@@ -66,24 +68,35 @@ th {
                             <td>{{ Solicitud.nombre_o_razon_social }}  {{ Solicitud.primer_apellido }}</td>
                             <td>{{ Solicitud.N_transparencia }}</td>
                             <td>{{ Solicitud.estado }}</td>
+                            
 
 
                             <td> 
                                 <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Solicitud</a>
                             
-                                {% if Solicitud.estado == "Sin responder" %}
-                                    <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de respuesta</a>
+                                {% if departamento.nombre_departamento == 'ADMIN' and Solicitud.estado == "Sin responder" %}
+                                <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de respuesta</a>
                                 {% endif %}
                                 
                                 {% if Solicitud.estado == "Respondida" %}
                                     <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
+                                   
+                                    {% if departamento.nombre_departamento == 'ADMIN'%}
+
                                     <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Propuesta respuesta</a>
+                                
+                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px; margin-bottom: 10px;">P-Prórroga</a>
+                                    {% endif %}
+
+
                                 {% endif %}
                             </td>
                             
 
                             <td class="invisible">{{ Solicitud.solicitud_text }}</td>
-                            <td class="respuesta"><div class="contenido-respuesta">{{ respuesta.respuesta }}</div></td>
+                            <td class="respuesta">{{ respuesta.respuesta }}</td>
+                            <td>{{ Solicitud.fecha_limite }}</td>
+
 
 
 
@@ -131,7 +144,7 @@ $(document).ready(function () {
         
         initComplete: function () {
             $("#tabla_fichas").show();
-            $('.contenido-respuesta').each(function () {
+            $('.respuesta').each(function () {
                 var contenido = $(this).text().trim();
                 if (contenido.length > 250) {
                     var recortado = contenido.substring(0, 250);
@@ -139,47 +152,52 @@ $(document).ready(function () {
                     $(this).html(recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>');
                 }
             });
-
-            // Event listeners para mostrar y ocultar más texto
-            $('.enlace-mostrar').click(function (e) {
-                e.preventDefault();
-                $(this).closest('.contenido-respuesta').find('.texto-restante').show();
-                $(this).closest('.mostrar-mas').hide();
-            });
-
-            $('.enlace-ocultar').click(function (e) {
-                e.preventDefault();
-                $(this).closest('.contenido-respuesta').find('.texto-restante').hide();
-                $(this).closest('.contenido-respuesta').find('.mostrar-mas').show();
-            });
         },
         // rowCallback para resaltar la palabra buscada
         "rowCallback": function (row, data, index) {
-            var searchTerm = $('#tabla_fichas_filter input').val().trim();
-            if (searchTerm !== '') {
-                var regex = new RegExp('(' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')', 'ig');
-                $(row).find('.contenido-respuesta').each(function() {
-                    $(this).html($(this).text().replace(regex, '<span class="resaltado">$1</span>'));
-                });
-            } else {
-                $(row).find('.contenido-respuesta').each(function() {
-                    $(this).find('.resaltado').contents().unwrap();
-                });
+    var searchTerm = $('#tabla_fichas_filter input').val().trim();
+    if (searchTerm !== '') {
+        var regex = new RegExp('(' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')', 'ig');
+        $(row).find('.respuesta').each(function() {
+            var originalText = $(this).data('original-text');
+            if (!originalText) {
+                originalText = $(this).text();
+                $(this).data('original-text', originalText);
             }
-        }
+            $(this).html(originalText.replace(regex, '<span class="resaltado">$1</span>'));
+        });
+    } else {
+        $(row).find('.respuesta').each(function() {
+            var originalText = $(this).data('original-text');
+            if (originalText) {
+                $(this).html(originalText);
+            }
+        });
+    }
+}
     });
 
     // Filtrar la tabla cuando se realiza una búsqueda
     $('#tabla_fichas_filter input').on('keyup', function () {
         tabla.search(this.value).draw();
     });
+
+    // Delegación de eventos para mostrar y ocultar más texto
+    $('#tabla_fichas tbody').on('click', '.enlace-mostrar', function (e) {
+        e.preventDefault();
+        $(this).closest('.respuesta').find('.texto-restante').show();
+        $(this).closest('.mostrar-mas').hide();
+    });
+
+    $('#tabla_fichas tbody').on('click', '.enlace-ocultar', function (e) {
+        e.preventDefault();
+        $(this).closest('.respuesta').find('.texto-restante').hide();
+        $(this).closest('.respuesta').find('.mostrar-mas').show();
+    });
 });
-
-
-
-
-
 </script>
+    
+    
 
 <script>
 var previewLinks = document.querySelectorAll('.preview-link');
@@ -272,40 +290,6 @@ previewLinks.forEach(function(link) {
             xhr.send();
         });
     });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var respuestas = document.querySelectorAll(".respuesta");
-        respuestas.forEach(function(respuesta) {
-            var contenido = respuesta.textContent.trim();
-            if (contenido.length > 250) {
-                var recortado = contenido.substring(0, 250);
-                var restante = contenido.substring(250);
-                respuesta.innerHTML = recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>';
-            }
-        });
-
-        // Agrega event listeners para mostrar y ocultar más texto
-        document.querySelectorAll('.enlace-mostrar').forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                var parent = e.target.closest('.respuesta');
-                parent.querySelector('.texto-restante').style.display = 'inline';
-                e.target.closest('.mostrar-mas').style.display = 'none';
-            });
-        });
-
-        document.querySelectorAll('.enlace-ocultar').forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                var parent = e.target.closest('.respuesta');
-                parent.querySelector('.texto-restante').style.display = 'none';
-                parent.querySelector('.mostrar-mas').style.display = 'inline';
-            });
-        });
-    });
-
-
 </script>
 
     

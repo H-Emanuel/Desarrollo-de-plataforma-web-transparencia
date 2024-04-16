@@ -79,6 +79,7 @@
                     </div> 
                 </div>
             </div>
+        
 
 
             {% csrf_token %}
@@ -183,4 +184,16 @@
 }
 
     </script>  
+<script>
+    document.querySelector('form').addEventListener('submit', function(event) {
+        var inputFecha = document.getElementById("Fecha_ingreso_DAJ").value;
+        var regex = /^\d{4}-\d{2}-\d{2}$/; // Expresión regular para AAAA-MM-DD
+    
+        if (!regex.test(inputFecha)) {
+            alert("Por favor, ingresa una Fecha de respuesta a DAJ.");
+            event.preventDefault(); // Evitar que el formulario se envíe si la validación falla
+        }
+    });
+    </script>
+    
 {% endblock custom_js %}

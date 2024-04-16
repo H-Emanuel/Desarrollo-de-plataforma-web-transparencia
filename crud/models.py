@@ -1,5 +1,7 @@
 from django.db import models
 import os
+from django.contrib.auth.models import User
+
 # Create your models here.
 RECEPCION_CHOICES = [
     ('CORREO ELECTRONICOS', 'CORREO ELECTRONICOS'),
@@ -11,6 +13,11 @@ RESPUESTA_PERSONA_CHOICES = [
     ('EMPRESA', 'EMPRESA'),
 ]
 
+DEPARTAMENTO_CHOICES = [
+    ('DEPARTAMENTO SIG', 'DEPARTAMENTO SIG'),
+    ('ASESORIA URBANA', 'ASESORIA URBANA'),
+    ('ADMIN', 'ADMIN'),
+]
 
 def content_file_name_adjunto(instance, filename):
     ext = filename.split('.')[-1]
@@ -19,8 +26,9 @@ def content_file_name_adjunto(instance, filename):
 
 
 class Solicitud(models.Model):
-    id = models.BigAutoField(primary_key=True, unique=True)    
-    # PARTE 1
+    id = models.BigAutoField(primary_key=True, unique=True)
+    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
+
     fecha_i_t = models.DateField()
     fecha_i_au = models.DateField()
     N_transparencia = models.CharField(max_length=100, blank=True, default='')
@@ -53,7 +61,7 @@ class Solicitud(models.Model):
     # PARTE 4
 
     estado = models.CharField(max_length=100, blank=True, default='Sin responder')
-
+    fecha_limite = models.DateField()
 
 
     class Meta:
@@ -79,3 +87,11 @@ class Respuesta_solicitud(models.Model):
     class Meta:
         verbose_name = "Respuesta"
         verbose_name_plural = "Respuestas"
+
+class Departamento(models.Model): 
+    id_usuario = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True )
+    nombre_departamento = models.CharField(max_length=150, blank=True, default='',choices=DEPARTAMENTO_CHOICES)
+
+    class Meta:
+        verbose_name = "Departamento"
+        verbose_name_plural = "Departamento"
