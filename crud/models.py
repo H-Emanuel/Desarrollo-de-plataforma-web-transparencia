@@ -29,8 +29,6 @@ DEPARTAMENTO_CHOICES_2 = [
     ('Departamento de Planificación ', 'Departamento de Planificación'),
     ('Departamento de Estudios y Pre Inversión ', 'Departamento de Estudios y Pre Inversión'),
     ('Departamento de Sistema de Información Geográfica ', 'Departamento de Sistema de Información Geográfica'),
-
-
 ]
 
 def content_file_name_adjunto(instance, filename):
