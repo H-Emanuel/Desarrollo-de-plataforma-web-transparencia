@@ -14,15 +14,23 @@ RESPUESTA_PERSONA_CHOICES = [
 ]
 
 DEPARTAMENTO_CHOICES = [
-    ('DEPARTAMENTO SIG', 'DEPARTAMENTO SIG'),
-    ('ASESORIA URBANA', 'ASESORIA URBANA'),
+    ('Departamento de Asesoría Urbana ', 'Departamento de Asesoría Urbana'),
+    ('Departamento de Presupuesto Municipal y Control Financiero de Proyectos', 'Departamento de Presupuesto Municipal y Control Financiero de Proyectos'),
+    ('Departamento de Planificación ', 'Departamento de Planificación'),
+    ('Departamento de Estudios y Pre Inversión ', 'Departamento de Estudios y Pre Inversión'),
+    ('Departamento de Sistema de Información Geográfica ', 'Departamento de Sistema de Información Geográfica'),
     ('ADMIN', 'ADMIN'),
 ]
 
 
 DEPARTAMENTO_CHOICES_2 = [
-    ('DEPARTAMENTO SIG', 'DEPARTAMENTO SIG'),
-    ('ASESORIA URBANA', 'ASESORIA URBANA'),
+    ('Departamento de Asesoría Urbana ', 'Departamento de Asesoría Urbana'),
+    ('Departamento de Presupuesto Municipal y Control Financiero de Proyectos', 'Departamento de Presupuesto Municipal y Control Financiero de Proyectos'),
+    ('Departamento de Planificación ', 'Departamento de Planificación'),
+    ('Departamento de Estudios y Pre Inversión ', 'Departamento de Estudios y Pre Inversión'),
+    ('Departamento de Sistema de Información Geográfica ', 'Departamento de Sistema de Información Geográfica'),
+
+
 ]
 
 def content_file_name_adjunto(instance, filename):
