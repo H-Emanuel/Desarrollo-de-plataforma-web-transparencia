@@ -108,6 +108,7 @@ def home(request):
 
     return render(request, 'home.html',data)
 
+
 @login_required  # Asegura que el usuario esté autenticado para acceder a esta vista
 def read(request):
     user = request.user
@@ -243,3 +244,36 @@ def respuesta(request, id=0):
         return redirect('read')
     
     return render(request, 'crud_respuesta.html',data)
+
+def respuesta_edit(request, id=0):
+
+    Respuesta_s = Respuesta_solicitud.objects.get(id = id)
+    print(Respuesta_s.respuesta)
+    if request.method == 'POST':
+        fecha_daj = request.POST['Fecha_ingreso_DAJ']
+
+        respuesta_text = request.POST['respuesta']
+        try: 
+            archivo_adjunto = request.FILES['archivo_adjunto']
+        except:
+            archivo_adjunto = None  # Utiliza None en lugar de una cadena vacía
+
+        try: 
+            archivo_adjunto_2 = request.FILES['archivo_adjunto_2']
+        except:
+            archivo_adjunto_2 = None  # Utiliza None en lugar de una cadena vacía
+
+
+        try: 
+            archivo_adjunto_3 = request.FILES['archivo_adjunto_3']
+        except:
+            archivo_adjunto_3 = None  # Utiliza None en lugar de una cadena vacía
+
+        data = {
+            'Respuesta':Respuesta_s,
+        }
+
+        return redirect('read')
+    
+    return render(request, 'crud_respuesta.html',data)
+

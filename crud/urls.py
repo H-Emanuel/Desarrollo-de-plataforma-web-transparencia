@@ -24,5 +24,6 @@ urlpatterns = [
     path('vista_previa_respuesta/<int:id>', views.vista_previa_respuesta, name="vista_previa_respuesta"),
 
     path('respuesta/<int:id>', views.respuesta, name="respuesta"),
+    path('respuesta_edit/<int:id>', views.respuesta_edit, name="respuesta_edit"),
 
 ]

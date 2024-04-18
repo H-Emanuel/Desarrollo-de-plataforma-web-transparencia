@@ -75,20 +75,14 @@ th {
                             <td> 
                                 <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Solicitud</a>
                             
-                                {% if departamento.nombre_departamento == 'ADMIN' and Solicitud.estado == "Sin responder" %}
                                 <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de respuesta</a>
-                                {% endif %}
                                 
                                 {% if Solicitud.estado == "Respondida" %}
                                     <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
                                    
-                                    {% if departamento.nombre_departamento == 'ADMIN'%}
-
-                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Propuesta respuesta</a>
+                                    <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Respuesta </a>
                                 
                                     <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px; margin-bottom: 10px;">P-Prórroga</a>
-                                    {% endif %}
-
 
                                 {% endif %}
                             </td>
