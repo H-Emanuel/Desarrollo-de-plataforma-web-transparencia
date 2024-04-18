@@ -63,7 +63,10 @@ def home(request):
             primer_apellido = request.POST['primer_apellido']
             segundo_apellido = request.POST['segundo_apellido']
             fecha_limite = calcular_fecha_limite()
-            Departamento_admin = request.POST['departamento_admin']
+            if departamento_usuario.nombre_departamento == "ADMIN":
+                Departamento_admin = request.POST['departamento_admin']
+            else:
+                Departamento_admin = ""
 
 
             Solicitud.objects.create(
