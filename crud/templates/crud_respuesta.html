@@ -57,7 +57,7 @@
         <div class="col-12">
             <div class="p-2 mb-4 mt-3 ">
                 <div class="container-fluid py-5">
-                    <h1 style="color: rgb(0, 119, 203); font-family: sans-serif" class="display-5 fw-bold">CREACIÓN PROPUESTA DE RESPUESTA ASESORIA URBANA</h1>
+                    <h1 style="color: rgb(0, 119, 203); font-family: sans-serif" class="display-5 fw-bold">{{ Titulo }} PROPUESTA DE RESPUESTA ASESORIA URBANA</h1>
                 </div>
             </div>
         </div>
@@ -75,10 +75,11 @@
                 <div class="col-12">
                     <div class="form-group">
                         <label class="form-label" for="Fecha_ingreso_DAJ"><b>Fecha de respuesta a DAJ</b></label>
-                        <input type="date" class="form-control" id="Fecha_ingreso_DAJ" name="Fecha_ingreso_DAJ" placeholder="Fecha_ingreso_DAJ">
+                        <input type="date" class="form-control" id="Fecha_ingreso_DAJ" name="Fecha_ingreso_DAJ" value="{{ Respuesta.fecha_daj|date:'Y-m-d' }}" placeholder="Fecha_ingreso_DAJ">
                     </div> 
                 </div>
             </div>
+            
         
 
 
@@ -87,10 +88,11 @@
                 <div class="col-12">
                     <div class="form-group">
                         <label class="form-label" for="respuesta"><b>Respuesta</b></label>
-                        <textarea type="text" class="form-control" id="respuesta" name="respuesta" value="{{ Respuesta.respuesta }}" rows="3"></textarea>
+                        <textarea class="form-control" id="respuesta" name="respuesta" rows="3">{{ Respuesta.respuesta }}</textarea>
                     </div>
                 </div>
             </div>
+            
 
             <br>
 
@@ -102,11 +104,15 @@
                         <br>
             
                         <label for="archivo_adjunto" class="custom-file-upload">
-                            <input type="file" id="archivo_adjunto" name="archivo_adjunto" onchange="mostrarNombreArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1')">
+                            <input type="file" id="archivo_adjunto" name="archivo_adjunto" onchange="mostrarNombreArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1', 'eliminar_archivo_1')">
                             1. Folio (consulta desde consejo transparencia)
                         </label>
                         <span id="nombre_archivo_seleccionado_1"></span>
+                        <span id="eliminar_archivo_1" style="display: none; cursor: pointer;" onclick="eliminarArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1', 'eliminar_archivo_1')">❌</span>
                         <br><br>
+                        
+                        
+                        
                         <label for="archivo_adjunto_2" class="custom-file-upload">
                             <input type="file" id="archivo_adjunto_2" name="archivo_adjunto_2" onchange="mostrarNombreArchivo('archivo_adjunto_2', 'nombre_archivo_seleccionado_2')">
                             2. Propuesta de respuesta (Respaldo)
@@ -171,17 +177,33 @@
     // Establecer la fecha máxima permitida como la fecha actual
     FechaingresoDAJ.setAttribute('max', obtenerFechaActual());
     
-    function mostrarNombreArchivo(inputId, spanId) {
+    function mostrarNombreArchivo(inputId, spanId, spanEliminarId) {
         var input = document.getElementById(inputId);
         var nombreArchivo = document.getElementById(spanId);
-        
+        var eliminarArchivo = document.getElementById(spanEliminarId);
+
         if (input.files.length > 0) {
             nombreArchivo.style.display = 'inline';
             nombreArchivo.textContent = input.files[0].name;
+            eliminarArchivo.style.display = 'inline';
         } else {
             nombreArchivo.style.display = 'none';
+            nombreArchivo.textContent = '';
+            eliminarArchivo.style.display = 'none';
         }
-}
+    }
+
+    function eliminarArchivo(inputId, spanId, spanEliminarId) {
+        var input = document.getElementById(inputId);
+        var nombreArchivo = document.getElementById(spanId);
+        var eliminarArchivo = document.getElementById(spanEliminarId);
+
+        input.value = ''; // Eliminar el archivo cargado
+        nombreArchivo.style.display = 'none';
+        nombreArchivo.textContent = ''; // Limpiar el texto del nombre del archivo
+        eliminarArchivo.style.display = 'none';
+    }
+
 
     </script>  
 <script>

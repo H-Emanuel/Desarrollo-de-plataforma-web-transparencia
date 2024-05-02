@@ -45,7 +45,7 @@
 
 .waterContaier a {
     position: absolute;
-    top: 40%;
+    top: 30%;
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 10px 15px;
@@ -72,8 +72,13 @@
 }
 
 .waterContaier a + a {
-    top: calc(50% + 50px); /* Ajusta la posición vertical del segundo botón */
+    top: calc(40% + 50px); /* Ajusta la posición vertical del segundo botón */
 }
+
+.waterContaier a + a + a {
+    top: calc(50% + 100px); /* Ajusta la posición vertical del tercer botón */
+}
+
 
 
 
@@ -132,10 +137,14 @@
 
             <div class="waterContaier">
                 <a target="_self"  href="{% url 'crear' %}">Generar Nuevo Registro de Transparencia</a>
-                <a  target="_self"  href="{% url 'read' %}">Ver Registros de Transparencias</a>
-            </div>
+                <a target="_self"  href="{% url 'read' %}">Ver Registros de Transparencias</a>
+                {% if departamento.nombre_departamento == 'ADMIN'%}
+                <a target="_self" href="">Ver Avance</a>
 
-            
+
+                {% endif %}
+
+            </div>      
         </div>
 
 

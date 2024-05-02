@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 RECEPCION_CHOICES = [
-    ('CORREO ELECTRONICOS', 'CORREO ELECTRONICOS'),
+    ('CORREO ELECTRONICO', 'CORREO ELECTRONICO'),
     ('PAPEL', 'PAPEL'),
 ]
 

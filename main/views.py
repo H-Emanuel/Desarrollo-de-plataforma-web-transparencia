@@ -4,13 +4,17 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
-
+from crud.models import *
 
 @login_required(login_url='/login/')
 def home(request):
-
+    user = request.user
+    departamento_usuario = Departamento.objects.filter(id_usuario=user).first()
+    data = {
+        'departamento':departamento_usuario
+    }
     
-    return render(request, 'core/home.html')
+    return render(request, 'core/home.html',data)
 
 def login(request):
     mensaje = ''

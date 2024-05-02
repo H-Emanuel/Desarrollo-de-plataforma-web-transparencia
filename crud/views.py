@@ -159,7 +159,7 @@ def calcular_fecha_limite():
     return fecha_actual
 
 
-    
+@login_required
 def vista_previa_solicitud(request, id):
     solicitud = Solicitud.objects.get(id=id)
 
@@ -186,6 +186,7 @@ def vista_previa_solicitud(request, id):
     }
     return JsonResponse(data)
 
+@login_required
 def vista_previa_respuesta(request, id):
     respuesta = Respuesta_solicitud.objects.get(id=id)
 
@@ -202,10 +203,14 @@ def vista_previa_respuesta(request, id):
     }
     return JsonResponse(data)
 
+@login_required
 def respuesta(request, id=0):
     solicitud = get_object_or_404(Solicitud, id=id)
+    Titulo = "CREACIÓN"
+
     data = {
-        'solicitud': solicitud
+        'solicitud': solicitud,
+        'Titulo': Titulo,
     }
     if request.method == 'POST':
         fecha_daj = request.POST['Fecha_ingreso_DAJ']
@@ -245,10 +250,16 @@ def respuesta(request, id=0):
     
     return render(request, 'crud_respuesta.html',data)
 
+@login_required
 def respuesta_edit(request, id=0):
+    Titulo = "EDICION"
+    Respuesta = Respuesta_solicitud.objects.get(id = id)
+    print(Respuesta.respuesta)
 
-    Respuesta_s = Respuesta_solicitud.objects.get(id = id)
-    print(Respuesta_s.respuesta)
+    data = {
+            'Respuesta':Respuesta,
+            'Titulo':Titulo
+        }
     if request.method == 'POST':
         fecha_daj = request.POST['Fecha_ingreso_DAJ']
 
@@ -269,11 +280,12 @@ def respuesta_edit(request, id=0):
         except:
             archivo_adjunto_3 = None  # Utiliza None en lugar de una cadena vacía
 
-        data = {
-            'Respuesta':Respuesta_s,
-        }
+        
 
         return redirect('read')
+    
+    
+   
     
     return render(request, 'crud_respuesta.html',data)
 
