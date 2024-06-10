@@ -5,8 +5,9 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from crud.models import *
-from django.db.models.functions import Lower
-from django.db.models import Count
+from django.db.models import Count, Value
+from django.db.models.functions import Lower, Concat
+
 import json
 
 @login_required(login_url='/login/')
@@ -27,8 +28,11 @@ def cuadro_de_mando(request):
 
     # Obtener el total por nombre o razón social, ignorando mayúsculas y minúsculas
     total_por_nombre = list(Solicitud.objects.annotate(
-        nombre_lower=Lower('nombre_o_razon_social')
-    ).values('nombre_lower').annotate(total=Count('nombre_lower')))
+        nombre_completo_lower=Lower(
+            Concat('nombre_o_razon_social', Value(' '), 'primer_apellido', Value(' '), 'segundo_apellido')
+        )
+    ).values('nombre_completo_lower').annotate(total=Count('nombre_completo_lower')))
+    print(total_por_nombre)
 
     contexto = {
         'total_por_estado': json.dumps(total_por_estado),

@@ -50,13 +50,13 @@
         <div class="col-12 mx-auto d-flex flex-column justify-content-center align-items-center">
 
 
-            <h2>Total por Estado</h2>
+            <h2>Total De Solicitudes por Estado</h2>
             <div class="chart-container">
                 <canvas id="pieChart"></canvas>
             </div>
         <br>
         <br>
-            <h2>Total por Nombre o Razón Social</h2>
+            <h2>Total De Solicitudes por Nombre o Razón Social</h2>
             <div class="chart-container">
                 <canvas id="barChart"></canvas>
             </div>
@@ -70,6 +70,7 @@
 
     </div>
 
+
     <script>
         // Los datos de Django se pasarán aquí
         const totalPorEstado = JSON.parse('{{ total_por_estado|safe }}');
@@ -79,9 +80,10 @@
         const estados = totalPorEstado.map(item => item.estado);
         const estadoCounts = totalPorEstado.map(item => item.total);
 
-        // Preparar los datos para el gráfico de barras
-        const nombres = totalPorNombre.map(item => item.nombre_lower);
-        const nombreCounts = totalPorNombre.map(item => item.total);
+        // Preparar los datos para el gráfico de barras, filtrando nombres vacíos o con espacios en blanco
+        const nombresValidos = totalPorNombre.filter(item => item.nombre_completo_lower.trim() !== '');
+        const nombres = nombresValidos.map(item => item.nombre_completo_lower);
+        const nombreCounts = nombresValidos.map(item => item.total);
 
         // Crear el gráfico de pastel
         const ctxPie = document.getElementById('pieChart').getContext('2d');
@@ -121,6 +123,7 @@
             }
         });
     </script>
+
 
 
 </section>
