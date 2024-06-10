@@ -37,7 +37,6 @@ def cuadro_de_mando(request):
         )
     ).values('nombre_completo_lower').annotate(total=Count('nombre_completo_lower')))
 
-
     contexto = {
         'total_por_estado': json.dumps(total_por_estado),
         'total_por_nombre': json.dumps(total_por_nombre),
