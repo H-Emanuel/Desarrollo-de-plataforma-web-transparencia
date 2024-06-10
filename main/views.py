@@ -29,10 +29,14 @@ def cuadro_de_mando(request):
     # Obtener el total por nombre o razón social, ignorando mayúsculas y minúsculas
     total_por_nombre = list(Solicitud.objects.annotate(
         nombre_completo_lower=Lower(
-            Concat('nombre_o_razon_social', Value(' '), 'primer_apellido', Value(' '), 'segundo_apellido')
+            Concat(
+                'nombre_o_razon_social', Value(' '), 
+                'primer_apellido', Value(' '), 
+                'segundo_apellido'
+            )
         )
     ).values('nombre_completo_lower').annotate(total=Count('nombre_completo_lower')))
-    print(total_por_nombre)
+
 
     contexto = {
         'total_por_estado': json.dumps(total_por_estado),

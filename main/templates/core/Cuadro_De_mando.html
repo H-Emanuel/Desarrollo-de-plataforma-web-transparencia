@@ -117,7 +117,15 @@
                 responsive: true,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1, // Esta propiedad asegura que el eje y muestra solo números enteros
+                            callback: function(value) { 
+                                if (Number.isInteger(value)) {
+                                    return value;
+                                }
+                            }
+                        }
                     }
                 }
             }
