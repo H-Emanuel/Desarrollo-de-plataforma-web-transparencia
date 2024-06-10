@@ -1,0 +1,128 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+
+{% block main_content%}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .mi-enlace {
+      padding: 12px 24px;
+      font-size: 18px;
+      border-radius: 25px;
+      background-color: #ff9800;
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease; /* Agregamos color a la transición */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Estilo al pasar el mouse por encima */
+    .mi-enlace:hover {
+      background-color: #ffba68;
+      transform: translateY(-2px);
+    }
+    
+    /* Estilo cuando se hace clic */
+    .mi-enlace:active {
+      transform: translateY(0);
+      box-shadow: none;
+      color: #fff; /* Mantenemos el color del texto como blanco al hacer clic */
+    }
+    .chart-container {
+            width: 500px; /* Ajusta este valor según el tamaño deseado */
+            height: 500px; /* Ajusta este valor según el tamaño deseado */
+            margin: 0 auto; /* Centra el contenedor */
+        }
+
+    </style>  
+<section class="container" >
+    <div class="row">
+        <div class="col-12">
+            <div class="p-2 mb-4 mt-3 ">
+                <div class="container-fluid py-5">
+                    <h1 style="color: rgb(0, 157, 255); font-family: sans-serif; text-align: center;" class="display-5 fw-bold">Cuadro De Mando</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mx-auto d-flex flex-column justify-content-center align-items-center">
+
+
+            <h2>Total por Estado</h2>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+            </div>
+        <br>
+        <br>
+            <h2>Total por Nombre o Razón Social</h2>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+        
+        
+        
+        
+           
+        </div>
+
+
+    </div>
+
+    <script>
+        // Los datos de Django se pasarán aquí
+        const totalPorEstado = JSON.parse('{{ total_por_estado|safe }}');
+        const totalPorNombre = JSON.parse('{{ total_por_nombre|safe }}');
+
+        // Preparar los datos para el gráfico de pastel
+        const estados = totalPorEstado.map(item => item.estado);
+        const estadoCounts = totalPorEstado.map(item => item.total);
+
+        // Preparar los datos para el gráfico de barras
+        const nombres = totalPorNombre.map(item => item.nombre_lower);
+        const nombreCounts = totalPorNombre.map(item => item.total);
+
+        // Crear el gráfico de pastel
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: estados,
+                datasets: [{
+                    data: estadoCounts,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+
+        // Crear el gráfico de barras
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        const barChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: nombres,
+                datasets: [{
+                    label: 'Total',
+                    data: nombreCounts,
+                    backgroundColor: '#36A2EB',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+
+</section>
+{% endblock %}
+

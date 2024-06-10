@@ -139,7 +139,7 @@
                 <a target="_self"  href="{% url 'crear' %}">Generar Nuevo Registro de Transparencia</a>
                 <a target="_self"  href="{% url 'read' %}">Ver Registros de Transparencias</a>
                 {% if departamento.nombre_departamento == 'ADMIN'%}
-                <a target="_self" href="">Ver Avance</a>
+                <a target="_self" href="{% url 'cuadro_de_mando' %}">Ver Avance</a>
 
 
                 {% endif %}

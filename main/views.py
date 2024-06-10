@@ -5,6 +5,9 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from crud.models import *
+from django.db.models.functions import Lower
+from django.db.models import Count
+import json
 
 @login_required(login_url='/login/')
 def home(request):
@@ -15,6 +18,26 @@ def home(request):
     }
     
     return render(request, 'core/home.html',data)
+
+
+@login_required(login_url='/login/')
+def cuadro_de_mando(request):
+    # Obtener el total por estado
+    total_por_estado = list(Solicitud.objects.values('estado').annotate(total=Count('estado')))
+
+    # Obtener el total por nombre o razón social, ignorando mayúsculas y minúsculas
+    total_por_nombre = list(Solicitud.objects.annotate(
+        nombre_lower=Lower('nombre_o_razon_social')
+    ).values('nombre_lower').annotate(total=Count('nombre_lower')))
+
+    contexto = {
+        'total_por_estado': json.dumps(total_por_estado),
+        'total_por_nombre': json.dumps(total_por_nombre),
+    }
+
+    return render(request, 'core/Cuadro_De_mando.html', contexto)
+
+
 
 def login(request):
     mensaje = ''
