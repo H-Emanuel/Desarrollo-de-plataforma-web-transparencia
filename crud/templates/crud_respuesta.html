@@ -104,13 +104,11 @@
                         <br>
             
                         <label for="archivo_adjunto" class="custom-file-upload">
-                            <input type="file" id="archivo_adjunto" name="archivo_adjunto" onchange="mostrarNombreArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1', 'eliminar_archivo_1')">
+                            <input type="file" id="archivo_adjunto" name="archivo_adjunto" accept=".pdf" multiple onchange="mostrarNombreArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1', 'eliminar_archivo_1')">
                             1. Folio (consulta desde consejo transparencia)
                         </label>
-                        <span id="nombre_archivo_seleccionado_1"></span>
-                        <span id="eliminar_archivo_1" style="display: none; cursor: pointer;" onclick="eliminarArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1', 'eliminar_archivo_1')">❌</span>
-                        <br><br>
                         
+
                         
                         
                         <label for="archivo_adjunto_2" class="custom-file-upload">

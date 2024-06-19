@@ -8,7 +8,9 @@ from .models import *
 from datetime import datetime,timedelta
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-
+from PyPDF2 import PdfMerger
+from django.core.files.base import ContentFile
+import io
 
 @login_required(login_url='/login/')
 def home(request):
@@ -212,32 +214,57 @@ def respuesta(request, id=0):
         'solicitud': solicitud,
         'Titulo': Titulo,
     }
+
     if request.method == 'POST':
         fecha_daj = request.POST['Fecha_ingreso_DAJ']
-
         respuesta_text = request.POST['respuesta']
-        try: 
-            archivo_adjunto = request.FILES['archivo_adjunto']
-        except:
-            archivo_adjunto = None  # Utiliza None en lugar de una cadena vacía
+        
+        archivos_adjuntos = request.FILES.getlist('archivo_adjunto')
+        pdf_merger = PdfMerger()
+        any_pdf_added = False
 
-        try: 
+        for archivo in archivos_adjuntos:
+            if archivo.content_type == 'application/pdf':
+                pdf_merger.append(archivo)
+                any_pdf_added = True
+            else:
+                # Manejar el caso en el que un archivo no sea PDF (opcional)
+                pass
+
+        try:
             archivo_adjunto_2 = request.FILES['archivo_adjunto_2']
-        except:
-            archivo_adjunto_2 = None  # Utiliza None en lugar de una cadena vacía
+        except KeyError:
+            archivo_adjunto_2 = None
 
-
-        try: 
+        try:
             archivo_adjunto_3 = request.FILES['archivo_adjunto_3']
-        except:
-            archivo_adjunto_3 = None  # Utiliza None en lugar de una cadena vacía
+        except KeyError:
+            archivo_adjunto_3 = None
 
-        # Crear una nueva instancia de Respuesta_solicitud y asignar la solicitud
+        if any_pdf_added:
+            # Crear un archivo PDF combinado en memoria
+            output_pdf = io.BytesIO()
+            pdf_merger.write(output_pdf)
+            pdf_merger.close()
+
+            # Resetear el puntero al principio del archivo en memoria
+            output_pdf.seek(0)
+
+            # Generar un nombre único para el archivo usando un timestamp
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            nombre_archivo_comprimido = f"archivo_comprimido_{timestamp}.pdf"
+
+            # Crear un ContentFile para guardar en el modelo
+            pdf_comprimido = ContentFile(output_pdf.read(), name=nombre_archivo_comprimido)
+        else:
+            pdf_comprimido = None
+
+        # Crear la respuesta de la solicitud
         Respuesta_solicitud.objects.create(
-            fecha_daj = fecha_daj,
-            id_solicitud=solicitud,  # Asignar la instancia de Solicitud
+            fecha_daj=fecha_daj,
+            id_solicitud=solicitud,
             respuesta=respuesta_text,
-            archivo_adjunto=archivo_adjunto,
+            archivo_adjunto=pdf_comprimido,
             archivo_adjunto_2=archivo_adjunto_2,
             archivo_adjunto_3=archivo_adjunto_3,
         )
@@ -248,7 +275,9 @@ def respuesta(request, id=0):
 
         return redirect('read')
     
-    return render(request, 'crud_respuesta.html',data)
+    return render(request, 'crud_respuesta.html', data)
+
+
 
 @login_required
 def respuesta_edit(request, id=0):
