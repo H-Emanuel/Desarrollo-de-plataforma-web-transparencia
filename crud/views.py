@@ -277,8 +277,6 @@ def respuesta(request, id=0):
     
     return render(request, 'crud_respuesta.html', data)
 
-
-
 @login_required
 def respuesta_edit(request, id=0):
     Titulo = "EDICION"
