@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # DATABASES = {
 #      'default': {
 #          'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#          'NAME': 'transparencia_AU',
+#          'NAME': 'transparencia_au',
 #          'USER': 'postgres',
 #          'PASSWORD': '1234',
 #          'HOST': 'localhost',

@@ -190,25 +190,38 @@ def vista_previa_solicitud(request, id):
 
 @login_required
 def vista_previa_respuesta(request, id):
-    respuesta = Respuesta_solicitud.objects.get(id=id)
-
-    data = {
-
-        'respuesta': respuesta.respuesta,
-        'fecha_daj': respuesta.fecha_daj,
-        'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
-        'archivo_adjunto_url_2': respuesta.archivo_adjunto_2.url if respuesta.archivo_adjunto_2 else None,
-        'archivo_adjunto_url_3': respuesta.archivo_adjunto_3.url if respuesta.archivo_adjunto_3 else None,
-
-
-
-    }
+    tipo = request.GET.get('tipo')
+    if tipo == 'A':
+        respuestas = Respuesta_solicitud.objects.filter(id_solicitud=id, tipo=tipo).order_by('fecha_daj')
+        data = {
+            'respuestas': [
+                {
+                    'respuesta': respuesta.respuesta,
+                    'fecha_daj': respuesta.fecha_daj,
+                    'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
+                    'archivo_adjunto_url_2': respuesta.archivo_adjunto_2.url if respuesta.archivo_adjunto_2 else None,
+                    'archivo_adjunto_url_3': respuesta.archivo_adjunto_3.url if respuesta.archivo_adjunto_3 else None,
+                } for respuesta in respuestas
+            ]
+        }
+    else:
+        respuesta = Respuesta_solicitud.objects.filter(id_solicitud=id, tipo=tipo).last()
+        data = {
+            'respuesta': respuesta.respuesta,
+            'fecha_daj': respuesta.fecha_daj,
+            'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
+            'archivo_adjunto_url_2': respuesta.archivo_adjunto_2.url if respuesta.archivo_adjunto_2 else None,
+            'archivo_adjunto_url_3': respuesta.archivo_adjunto_3.url if respuesta.archivo_adjunto_3 else None,
+        }    
     return JsonResponse(data)
 
 @login_required
 def respuesta(request, id=0):
     solicitud = get_object_or_404(Solicitud, id=id)
     Titulo = "CREACIÓN"
+
+    # Obtener el tipo de respuesta desde los parámetros de la URL o establecer un valor por defecto
+    tipo_respuesta = request.GET.get('tipo', 'R')
 
     data = {
         'solicitud': solicitud,
@@ -267,9 +280,10 @@ def respuesta(request, id=0):
             archivo_adjunto=pdf_comprimido,
             archivo_adjunto_2=archivo_adjunto_2,
             archivo_adjunto_3=archivo_adjunto_3,
+            tipo=tipo_respuesta
         )
 
-        # Actualizar el estado de la solicitud a "RESPONDIDA"
+        # Actualizar el estado de la solicitud a "Respondida"
         solicitud.estado = "Respondida"
         solicitud.save()
 

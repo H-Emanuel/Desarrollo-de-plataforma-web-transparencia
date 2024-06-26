@@ -69,21 +69,25 @@ th {
                             <td>{{ Solicitud.nombre_o_razon_social }}  {{ Solicitud.primer_apellido }}</td>
                             <td>{{ Solicitud.N_transparencia }}</td>
                             <td>{{ Solicitud.estado }}</td>
-                            
-
-
+                                                        
                             <td> 
-                                <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Solicitud</a>
-                            
-                                <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de respuesta</a>
-                                
-                                {% if Solicitud.estado == "Respondida" %}
-                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
-                                   
-                                    <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Respuesta </a>
-                                
-                                    <a href="#" class="btn btn-purple preview-res-link" data-id="{{ respuesta.id }}" style="margin-top: 10px; margin-bottom: 10px;">P-Prórroga</a>
-
+                                <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Solicitud</a>                                
+                                {% if Solicitud.N_transparencia == 'C' %}
+                                    <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de Amparo</a>
+                                    {% if Solicitud.estado == "Respondida" %}
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Amparo</a>
+                                        <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Amparo</a>                            
+                                    {% endif %}
+                                {% else %}
+                                    {% if Solicitud.estado == "Respondida" %}
+                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
+                                        <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Respuesta</a>
+                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-prorroga-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">P-Prórroga</a>
+                                    {% else %}
+                                        <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de respuesta</a>
+                                    {% endif %}
                                 {% endif %}
                             </td>
                             
@@ -255,46 +259,71 @@ previewLinks.forEach(function(link) {
 </script>
 
 <script>
-    var previewLinks = document.querySelectorAll('.preview-res-link');
-    previewLinks.forEach(function(link) {
-        link.addEventListener('click', function(event) {
-            event.preventDefault(); // Evitar el comportamiento predeterminado del enlace
-    
-            var solicitudId = this.getAttribute('data-id'); // Obtener el ID de la solicitud
-    
-            // Hacer una solicitud AJAX a la vista de Django para obtener los datos de la solicitud
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/accion/vista_previa_respuesta/' + solicitudId, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var data = JSON.parse(xhr.responseText);
-                    // Construir el texto con los datos de la solicitud
-                    var previewDataText = 'Respuesta: ' + data.respuesta + '\n'+
-                                          'Fecha DAJ: ' + data.fecha_daj + '\n';
+    function addPreviewEventListener(selector, tipo) {
+        var previewLinks = document.querySelectorAll(selector);
+        previewLinks.forEach(function(link) {
+            link.addEventListener('click', function(event) {
+                event.preventDefault(); // Evitar el comportamiento predeterminado del enlace
+        
+                var solicitudId = this.getAttribute('data-id'); // Obtener el ID de la solicitud
+        
+                // Hacer una solicitud AJAX a la vista de Django para obtener los datos de la solicitud
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/accion/vista_previa_respuesta/' + solicitudId + '?tipo=' + tipo, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var data = JSON.parse(xhr.responseText);
 
-                    var previewDataElement = document.getElementById('previewData');
-                    previewDataElement.innerText = previewDataText;
-    
-                    // Si hay un archivo adjunto, agregar enlace de descarga
-                    if (data.archivo_adjunto_url) {
-                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Folio</a>';
-                    }
-                    if (data.archivo_adjunto_url_2) {
-                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url_2 + '" download>Descargar Archivo Propuesta de respuesta</a>';
-                    }
+                        var previewDataText = '';
+                        if (Array.isArray(data.respuestas)) {
+                            data.respuestas.forEach(function(respuesta, index) {
+                                previewDataText += 'Respuesta ' + (index + 1) + ': ' + respuesta.respuesta + '\n' +
+                                                   'Fecha DAJ: ' + respuesta.fecha_daj + '\n\n';
 
-                    if (data.archivo_adjunto_url_3) {
-                        previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos,PDF, etc)</a>';
-                    }
-
+                                // Si hay un archivo adjunto, agregar enlace de descarga
+                                if (respuesta.archivo_adjunto_url) {
+                                    previewDataText += '<br><a href="' + respuesta.archivo_adjunto_url + '" download>Descargar Archivo Folio</a><br>';
+                                }
+                                if (respuesta.archivo_adjunto_url_2) {
+                                    previewDataText += '<br><a href="' + respuesta.archivo_adjunto_url_2 + '" download>Descargar Archivo Propuesta de respuesta</a><br>';
+                                }
+                                if (respuesta.archivo_adjunto_url_3) {
+                                    previewDataText += '<br><a href="' + respuesta.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos,PDF, etc)</a><br>';
+                                }
+                                previewDataText += '<hr>';
+                            });
+                        } else {
+                            previewDataText = 'Respuesta: ' + data.respuesta + '\n' +
+                                              'Fecha DAJ: ' + data.fecha_daj + '\n';
+        
+                            // Si hay un archivo adjunto, agregar enlace de descarga
+                            if (data.archivo_adjunto_url) {
+                                previewDataText += '<br><a href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Folio</a><br>';
+                            }
+                            if (data.archivo_adjunto_url_2) {
+                                previewDataText += '<br><a href="' + data.archivo_adjunto_url_2 + '" download>Descargar Archivo Propuesta de respuesta</a><br>';
+                            }
+                            if (data.archivo_adjunto_url_3) {
+                                previewDataText += '<br><a href="' + data.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos,PDF, etc)</a><br>';
+                            }
+                        }
     
-                    $('#previewModal').modal('show'); // Mostrar el modal utilizando jQuery
-                }
-            };
-            xhr.send();
+                        var previewDataElement = document.getElementById('previewData');
+                        previewDataElement.innerHTML = previewDataText;
+        
+                        $('#previewModal').modal('show'); // Mostrar el modal utilizando jQuery
+                    }
+                };
+                xhr.send();
+            });
         });
-    });
+    }
+
+    // Agregar los listeners para los diferentes tipos de enlaces
+    addPreviewEventListener('.preview-res-amparo-link', 'A');
+    addPreviewEventListener('.preview-res-respuesta-link', 'R');
 </script>
 
-    
+
+
 {% endblock custom_js %}

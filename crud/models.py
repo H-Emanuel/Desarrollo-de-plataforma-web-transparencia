@@ -90,12 +90,19 @@ def content_file_name_respuesta(instance, filename):
 
 
 class Respuesta_solicitud(models.Model): 
-    id_solicitud = models.OneToOneField(Solicitud, on_delete=models.CASCADE)
+    TIPOS = [
+        ('A', 'Amparo'),
+        ('R', 'Respuesta'),
+    ]
+
+    # id_solicitud = models.OneToOneField(Solicitud, on_delete=models.CASCADE)
+    id_solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE)
     respuesta = models.TextField(blank=True, default='')
     archivo_adjunto = models.ImageField(upload_to=content_file_name_respuesta, blank=True, default='', null=True)
     archivo_adjunto_2 = models.ImageField(upload_to=content_file_name_respuesta, blank=True, default='', null=True)
     archivo_adjunto_3 = models.ImageField(upload_to=content_file_name_respuesta, blank=True, default='', null=True)
     fecha_daj = models.DateField(blank=True)
+    tipo = models.CharField(max_length=1, choices=TIPOS, default='R')
 
     class Meta:
         verbose_name = "Respuesta"
