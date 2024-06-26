@@ -321,7 +321,12 @@ def respuesta_edit(request, id=0):
         except:
             archivo_adjunto_3 = None  # Utiliza None en lugar de una cadena vacía
 
-        
+        Respuesta.fecha_daj = request.POST['Fecha_ingreso_DAJ']
+        Respuesta.respuesta = request.POST['respuesta']
+        Respuesta.archivo_adjunto = archivo_adjunto 
+        Respuesta.archivo_adjunto_2 = archivo_adjunto_2 
+        Respuesta.archivo_adjunto_3 = archivo_adjunto_3 
+        Respuesta.save()
 
         return redirect('read')
     

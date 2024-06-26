@@ -81,7 +81,7 @@ th {
                                 {% else %}
                                     {% if Solicitud.estado == "Respondida" %}
                                         <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
-                                        <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Respuesta</a>
+                                        <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Editar Respuesta</a>
                                         <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de Amparo</a>
                                         <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Amparo</a>
                                         <a href="#" class="btn btn-purple preview-res-prorroga-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">P-Prórroga</a>
