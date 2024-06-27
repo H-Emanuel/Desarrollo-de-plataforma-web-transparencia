@@ -380,26 +380,25 @@
 {% block custom_js %}
 <!-- DESACTIVAR O ACTIVAR INSERT DE OTROS -->
 <script>
-function obtenerFechaActual() {
-    const ahora = new Date();
-    const anio = ahora.getFullYear();
-    let mes = ahora.getMonth() + 1;
-    let dia = ahora.getDate();
-
-    // Agregar cero delante si el mes o el día son menores que 10
-    mes = mes < 10 ? '0' + mes : mes;
-    dia = dia < 10 ? '0' + dia : dia;
-
-    return anio + '-' + mes + '-' + dia;
-}
-
-// Obtener elementos de fecha de entrada
-const fechaTransparencia = document.getElementById('Fecha_ingreso_t');
-const fechaAsesoriaUrbana = document.getElementById('Fecha_ingreso_AU');
-
-// Establecer la fecha máxima permitida como la fecha actual
-fechaTransparencia.setAttribute('max', obtenerFechaActual());
-fechaAsesoriaUrbana.setAttribute('max', obtenerFechaActual());
-
-</script>  
+    function obtenerFechaActual() {
+        const ahora = new Date();
+        const anio = ahora.getFullYear();
+        let mes = ahora.getMonth() + 1;
+        let dia = ahora.getDate();
+    
+        // Agregar cero delante si el mes o el día son menores que 10
+        mes = mes < 10 ? '0' + mes : mes;
+        dia = dia < 10 ? '0' + dia : dia;
+    
+        return anio + '-' + mes + '-' + dia;
+    }
+    
+    // Obtener elementos de fecha de entrada
+    const fechaTransparencia = document.getElementById('Fecha_ingreso_t');
+    const fechaAsesoriaUrbana = document.getElementById('Fecha_ingreso_AU');
+    
+    // Establecer la fecha máxima permitida como la fecha actual
+    fechaTransparencia.setAttribute('max', obtenerFechaActual());
+    fechaAsesoriaUrbana.setAttribute('max', obtenerFechaActual());
+</script>
 {% endblock custom_js %}

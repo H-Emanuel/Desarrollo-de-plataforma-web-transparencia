@@ -20,95 +20,71 @@ def home(request):
     OPTIONS = {
         'RECEPCION_CHOICES': RECEPCION_CHOICES,
         'RESPUESTA_PERSONA_CHOICES': RESPUESTA_PERSONA_CHOICES,
-        'DEPARTAMENTO_CHOICES': DEPARTAMENTO_CHOICES_2,
-
-        }
+        'DEPARTAMENTO_CHOICES': DEPARTAMENTO_CHOICES_2,        
+    }
     
-
-    data = {'OPTIONS': OPTIONS,
-            'departamento': departamento_usuario,}
-
+    data = {'OPTIONS': OPTIONS, 'departamento': departamento_usuario}
 
     if request.method == "POST":
-            fecha_ingreso_t = datetime.strptime(request.POST['Fecha_ingreso_t'], '%Y-%m-%d').date()
-            fecha_ingreso_au = datetime.strptime(request.POST['Fecha_ingreso_AU'], '%Y-%m-%d').date()
+        fecha_ingreso_t = datetime.strptime(request.POST['Fecha_ingreso_t'], '%Y-%m-%d').date()
+        fecha_ingreso_au = datetime.strptime(request.POST['Fecha_ingreso_AU'], '%Y-%m-%d').date()
+        N_transparencia = request.POST['N_transparencia']
+        dirigido = "Municipalidad de Valparaíso"
+        region = "Región de Valparaiso"
+        recepciones = request.POST['recepcion']
+        email = request.POST['e_email']
+        solicitud_text = request.POST['solicitud_text']
+        observaciones = request.POST['observaciones']
 
-            N_transparencia = request.POST['N_transparencia']
+        try: 
+            archivo_adjunto = request.FILES['archivo_adjunto']
+        except:
+            archivo_adjunto = ""
 
-            dirigido = "Municipalidad de Valparaíso"
-            region = "Región de Valparaiso"
-            recepciones = request.POST['recepcion']
-            email = request.POST['e_email']
-            solicitud_text = request.POST['solicitud_text']
-            observaciones = request.POST['observaciones']
+        soporte = request.POST['soporte']
+        formato = request.POST['formato']
+        solicitante_inicio_seccion = request.POST['solicitante_inicio_seccion'] == "Si"
+        forma_de_recepccion = request.POST['forma_de_recepccion']
+        otra_forma_De_entrega = request.POST['otra_forma_De_entrega']
+        persona = request.POST['persona']
+        nombre_o_razon_social = request.POST['nombre_o_razon_social']
+        primer_apellido = request.POST['primer_apellido']
+        segundo_apellido = request.POST['segundo_apellido']
+        fecha_limite = calcular_fecha_limite(fecha_ingreso_t)
 
-            try: 
-                archivo_adjunto = request.FILES['archivo_adjunto']
-            except:
-                archivo_adjunto = ""
+        if departamento_usuario.nombre_departamento == "ADMIN":
+            Departamento_admin = request.POST['departamento_admin']
+        else:
+            Departamento_admin = ""
 
-            soporte = request.POST['soporte']
-            formato = request.POST['formato']
+        # Crear la solicitud
+        Solicitud.objects.create(
+            fecha_i_t=fecha_ingreso_t,
+            fecha_i_au=fecha_ingreso_au,
+            N_transparencia=N_transparencia,
+            dirigido=dirigido,
+            region=region,
+            recepcion=recepciones,
+            email=email,
+            solicitud_text=solicitud_text,
+            observaciones=observaciones,
+            archivo_adjunto=archivo_adjunto,
+            soporte=soporte,
+            formato=formato,
+            solicitante_inicio_seccion=solicitante_inicio_seccion,
+            forma_de_recepccion=forma_de_recepccion,
+            otra_forma_De_entrega=otra_forma_De_entrega,
+            persona=persona,
+            nombre_o_razon_social=nombre_o_razon_social,
+            primer_apellido=primer_apellido,
+            segundo_apellido=segundo_apellido,
+            id_usuario=request.user,
+            fecha_limite=fecha_limite,
+            Departamento_admin=Departamento_admin
+        )
+        return redirect('home')
 
-            if request.POST['solicitante_inicio_seccion']  =="Si":
-                solicitante_inicio_seccion = True 
-            else: 
-                solicitante_inicio_seccion = False 
-
-            
-            forma_de_recepccion = request.POST['forma_de_recepccion']
-            otra_forma_De_entrega = request.POST['otra_forma_De_entrega']
-
-            
-            persona = request.POST['persona']
-            nombre_o_razon_social = request.POST['nombre_o_razon_social']
-            primer_apellido = request.POST['primer_apellido']
-            segundo_apellido = request.POST['segundo_apellido']
-            fecha_limite = calcular_fecha_limite()
-            if departamento_usuario.nombre_departamento == "ADMIN":
-                Departamento_admin = request.POST['departamento_admin']
-            else:
-                Departamento_admin = ""
-
-
-            Solicitud.objects.create(
-                  
-                fecha_i_t = fecha_ingreso_t,
-                fecha_i_au = fecha_ingreso_au,
-                N_transparencia = N_transparencia,
-
-                dirigido = dirigido,
-                region =region,
-                recepcion =recepciones,
-                email = email,
-                solicitud_text = solicitud_text,
-                observaciones = observaciones,
-                archivo_adjunto = archivo_adjunto,
-
-                soporte = soporte,
-                formato = formato,
-
-                solicitante_inicio_seccion = solicitante_inicio_seccion, # cambio de verdadero o falso
-                
-                forma_de_recepccion = forma_de_recepccion,
-                otra_forma_De_entrega = otra_forma_De_entrega,
-
-            # PARTE 3 
-                
-                persona = persona,
-                nombre_o_razon_social = nombre_o_razon_social,
-                primer_apellido = primer_apellido,
-                segundo_apellido = segundo_apellido,
-
-            # PARTE 4
-                id_usuario = request.user,
-                fecha_limite = fecha_limite,
-                Departamento_admin = Departamento_admin
-                
-            )
-            return redirect('home')
-
-    return render(request, 'home.html',data)
+    return render(request, 'home.html', data)
 
 
 @login_required  # Asegura que el usuario esté autenticado para acceder a esta vista
@@ -144,21 +120,18 @@ def read(request):
 
     return render(request, 'read.html', data)
 
-def calcular_fecha_limite():
-    # Obtener la fecha actual
-    fecha_actual = datetime.now().date()
-
+def calcular_fecha_limite(fecha_ingreso):
     # Contador para llevar la cuenta de los días hábiles
     dias_habiles = 0
 
     # Bucle para encontrar la fecha límite
     while dias_habiles < 13:
-        fecha_actual += timedelta(days=1)
+        fecha_ingreso += timedelta(days=1)
         # Si es sábado o domingo, no se cuentan como días hábiles
-        if fecha_actual.weekday() not in [5, 6]:
+        if fecha_ingreso.weekday() not in [5, 6]:
             dias_habiles += 1
 
-    return fecha_actual
+    return fecha_ingreso
 
 
 @login_required
@@ -226,6 +199,7 @@ def respuesta(request, id=0):
     data = {
         'solicitud': solicitud,
         'Titulo': Titulo,
+        'tipo': tipo_respuesta  # Pasamos el tipo de respuesta al contexto
     }
 
     if request.method == 'POST':

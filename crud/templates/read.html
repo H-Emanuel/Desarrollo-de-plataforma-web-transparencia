@@ -293,8 +293,7 @@ previewLinks.forEach(function(link) {
                                 previewDataText += '<hr>';
                             });
                         } else {
-                            previewDataText = 'Respuesta: ' + data.respuesta + '\n' +
-                                              'Fecha DAJ: ' + data.fecha_daj + '\n';
+                            previewDataText = 'Fecha DAJ: ' + data.fecha_daj + '<br>' + 'Respuesta: ' + data.respuesta + '<br>';
         
                             // Si hay un archivo adjunto, agregar enlace de descarga
                             if (data.archivo_adjunto_url) {
