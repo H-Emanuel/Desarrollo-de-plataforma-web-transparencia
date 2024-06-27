@@ -205,55 +205,35 @@ def respuesta(request, id=0):
     if request.method == 'POST':
         fecha_daj = request.POST['Fecha_ingreso_DAJ']
         respuesta_text = request.POST['respuesta']
-        
-        archivos_adjuntos = request.FILES.getlist('archivo_adjunto')
-        pdf_merger = PdfMerger()
-        any_pdf_added = False
-
-        for archivo in archivos_adjuntos:
-            if archivo.content_type == 'application/pdf':
-                pdf_merger.append(archivo)
-                any_pdf_added = True
-            else:
-                # Manejar el caso en el que un archivo no sea PDF (opcional)
-                pass
 
         try:
-            archivo_adjunto_2 = request.FILES['archivo_adjunto_2']
+            archivos_adjuntos_1 = request.FILES.getlist('archivo_adjunto')
         except KeyError:
-            archivo_adjunto_2 = None
+            archivos_adjuntos_1 = None
 
         try:
-            archivo_adjunto_3 = request.FILES['archivo_adjunto_3']
+            archivos_adjuntos_2 = request.FILES.getlist('archivo_adjunto_2')
         except KeyError:
-            archivo_adjunto_3 = None
+            archivos_adjuntos_2 = None
 
-        if any_pdf_added:
-            # Crear un archivo PDF combinado en memoria
-            output_pdf = io.BytesIO()
-            pdf_merger.write(output_pdf)
-            pdf_merger.close()
+        try:
+            archivos_adjuntos_3 = request.FILES.getlist('archivo_adjunto_3')
+        except KeyError:
+            archivos_adjuntos_3 = None
 
-            # Resetear el puntero al principio del archivo en memoria
-            output_pdf.seek(0)
+        pdf_comprimido_1 = procesar_archivos_adjuntos(archivos_adjuntos_1)
+        pdf_comprimido_2 = procesar_archivos_adjuntos(archivos_adjuntos_2)
+        pdf_comprimido_3 = procesar_archivos_adjuntos(archivos_adjuntos_3)
 
-            # Generar un nombre único para el archivo usando un timestamp
-            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-            nombre_archivo_comprimido = f"archivo_comprimido_{timestamp}.pdf"
-
-            # Crear un ContentFile para guardar en el modelo
-            pdf_comprimido = ContentFile(output_pdf.read(), name=nombre_archivo_comprimido)
-        else:
-            pdf_comprimido = None
 
         # Crear la respuesta de la solicitud
         Respuesta_solicitud.objects.create(
             fecha_daj=fecha_daj,
             id_solicitud=solicitud,
             respuesta=respuesta_text,
-            archivo_adjunto=pdf_comprimido,
-            archivo_adjunto_2=archivo_adjunto_2,
-            archivo_adjunto_3=archivo_adjunto_3,
+            archivo_adjunto=pdf_comprimido_1,
+            archivo_adjunto_2=pdf_comprimido_2,
+            archivo_adjunto_3=pdf_comprimido_3,
             tipo=tipo_respuesta
         )
 
@@ -265,47 +245,110 @@ def respuesta(request, id=0):
     
     return render(request, 'crud_respuesta.html', data)
 
+def procesar_archivos_adjuntos(archivos_adjuntos):
+    pdf_merger = PdfMerger()
+    any_pdf_added = False
+
+    for archivo in archivos_adjuntos:
+        if archivo.content_type == 'application/pdf':
+            pdf_merger.append(archivo)
+            any_pdf_added = True
+        else:
+            # Manejar el caso en el que un archivo no sea PDF (opcional)
+            pass
+
+    if any_pdf_added:
+        output_pdf = io.BytesIO()
+        pdf_merger.write(output_pdf)
+        pdf_merger.close()
+        output_pdf.seek(0)
+        
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        nombre_archivo_comprimido = f"archivo_comprimido_{timestamp}.pdf"
+        pdf_comprimido = ContentFile(output_pdf.read(), name=nombre_archivo_comprimido)
+    else:
+        pdf_comprimido = None
+
+    return pdf_comprimido
+
+
 @login_required
 def respuesta_edit(request, id=0):
     Titulo = "EDICION"
-    Respuesta = Respuesta_solicitud.objects.get(id = id)
-    print(Respuesta.respuesta)
+    respuesta = get_object_or_404(Respuesta_solicitud, id=id)
 
     data = {
-            'Respuesta':Respuesta,
-            'Titulo':Titulo
-        }
+        'Respuesta': respuesta,
+        'Titulo': Titulo
+    }
+
     if request.method == 'POST':
         fecha_daj = request.POST['Fecha_ingreso_DAJ']
-
         respuesta_text = request.POST['respuesta']
-        try: 
-            archivo_adjunto = request.FILES['archivo_adjunto']
-        except:
-            archivo_adjunto = None  # Utiliza None en lugar de una cadena vacía
 
-        try: 
-            archivo_adjunto_2 = request.FILES['archivo_adjunto_2']
-        except:
-            archivo_adjunto_2 = None  # Utiliza None en lugar de una cadena vacía
+        try:
+            archivos_adjuntos_1 = request.FILES.getlist('archivo_adjunto')
+        except KeyError:
+            archivos_adjuntos_1 = None
 
+        try:
+            archivos_adjuntos_2 = request.FILES.getlist('archivo_adjunto_2')
+        except KeyError:
+            archivos_adjuntos_2 = None
 
-        try: 
-            archivo_adjunto_3 = request.FILES['archivo_adjunto_3']
-        except:
-            archivo_adjunto_3 = None  # Utiliza None en lugar de una cadena vacía
+        try:
+            archivos_adjuntos_3 = request.FILES.getlist('archivo_adjunto_3')
+        except KeyError:
+            archivos_adjuntos_3 = None
 
-        Respuesta.fecha_daj = request.POST['Fecha_ingreso_DAJ']
-        Respuesta.respuesta = request.POST['respuesta']
-        Respuesta.archivo_adjunto = archivo_adjunto 
-        Respuesta.archivo_adjunto_2 = archivo_adjunto_2 
-        Respuesta.archivo_adjunto_3 = archivo_adjunto_3 
-        Respuesta.save()
+        # pdf_comprimido_1 = procesar_archivos_adjuntos(archivos_adjuntos_1)
+        # pdf_comprimido_2 = procesar_archivos_adjuntos(archivos_adjuntos_2)
+        # pdf_comprimido_3 = procesar_archivos_adjuntos(archivos_adjuntos_3)
+
+        # Combinar archivos nuevos con los antiguos
+        archivo_adjunto_combinado = combinar_archivos_adjuntos(archivos_adjuntos_1, respuesta.archivo_adjunto)
+        archivo_adjunto_2_combinado = combinar_archivos_adjuntos(archivos_adjuntos_2, respuesta.archivo_adjunto_2)
+        archivo_adjunto_3_combinado = combinar_archivos_adjuntos(archivos_adjuntos_3, respuesta.archivo_adjunto_3)
+
+        # Actualizar la respuesta de la solicitud
+        respuesta.fecha_daj = fecha_daj
+        respuesta.respuesta = respuesta_text
+        respuesta.archivo_adjunto = archivo_adjunto_combinado
+        respuesta.archivo_adjunto_2 = archivo_adjunto_2_combinado
+        respuesta.archivo_adjunto_3 = archivo_adjunto_3_combinado
+        respuesta.save()
 
         return redirect('read')
-    
-    
-   
-    
-    return render(request, 'crud_respuesta.html',data)
 
+    return render(request, 'crud_respuesta.html', data)
+
+def combinar_archivos_adjuntos(archivo_nuevo, archivo_viejo):
+    if archivo_nuevo:
+        pdf_merger = PdfMerger()
+        
+        # Agregar archivo nuevo
+        pdf_merger.append(archivo_nuevo)
+
+        if archivo_viejo:
+            # Agregar archivo viejo si existe
+            pdf_merger.append(archivo_viejo)
+
+        # Crear archivo PDF combinado en memoria
+        output_pdf = io.BytesIO()
+        pdf_merger.write(output_pdf)
+        pdf_merger.close()
+
+        # Resetear el puntero al principio del archivo en memoria
+        output_pdf.seek(0)
+
+        # Generar un nombre único para el archivo usando un timestamp
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        nombre_archivo_comprimido = f"archivo_comprimido_{timestamp}.pdf"
+
+        # Crear un ContentFile para guardar en el modelo
+        pdf_comprimido = ContentFile(output_pdf.read(), name=nombre_archivo_comprimido)
+    else:
+        # Si no hay archivo nuevo, devolver el archivo viejo
+        pdf_comprimido = archivo_viejo
+
+    return pdf_comprimido
