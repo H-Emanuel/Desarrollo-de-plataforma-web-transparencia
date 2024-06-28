@@ -254,7 +254,6 @@ def respuesta(request, id=0):
             archivos_adjuntos_3 = None
 
         pdf_comprimido_1 = procesar_archivos_adjuntos(archivos_adjuntos_1)
-        pdf_comprimido_2 = procesar_archivos_adjuntos(archivos_adjuntos_2)
         pdf_comprimido_3 = procesar_archivos_adjuntos(archivos_adjuntos_3)
 
 
@@ -264,7 +263,7 @@ def respuesta(request, id=0):
             id_solicitud=solicitud,
             respuesta=respuesta_text,
             archivo_adjunto=pdf_comprimido_1,
-            archivo_adjunto_2=pdf_comprimido_2,
+            archivo_adjunto_2=archivos_adjuntos_2,
             archivo_adjunto_3=pdf_comprimido_3,
             tipo=tipo_respuesta
         )
@@ -339,14 +338,13 @@ def respuesta_edit(request, id=0):
 
         # Combinar archivos nuevos con los antiguos
         archivo_adjunto_combinado = combinar_archivos_adjuntos(archivos_adjuntos_1, respuesta.archivo_adjunto)
-        archivo_adjunto_2_combinado = combinar_archivos_adjuntos(archivos_adjuntos_2, respuesta.archivo_adjunto_2)
         archivo_adjunto_3_combinado = combinar_archivos_adjuntos(archivos_adjuntos_3, respuesta.archivo_adjunto_3)
 
         # Actualizar la respuesta de la solicitud
         respuesta.fecha_daj = fecha_daj
         respuesta.respuesta = respuesta_text
         respuesta.archivo_adjunto = archivo_adjunto_combinado
-        respuesta.archivo_adjunto_2 = archivo_adjunto_2_combinado
+        respuesta.archivo_adjunto_2 = archivos_adjuntos_2
         respuesta.archivo_adjunto_3 = archivo_adjunto_3_combinado
         respuesta.save()
 
