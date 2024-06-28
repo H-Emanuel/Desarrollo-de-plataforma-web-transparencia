@@ -120,19 +120,51 @@ def read(request):
 
     return render(request, 'read.html', data)
 
+
+
 def calcular_fecha_limite(fecha_ingreso):
     # Contador para llevar la cuenta de los días hábiles
     dias_habiles = 0
+    fecha_actual = fecha_ingreso  # Comenzar desde la fecha de ingreso
 
     # Bucle para encontrar la fecha límite
     while dias_habiles < 13:
-        fecha_ingreso += timedelta(days=1)
         # Si es sábado o domingo, no se cuentan como días hábiles
-        if fecha_ingreso.weekday() not in [5, 6]:
+        if fecha_actual.weekday() not in [5, 6]:
             dias_habiles += 1
+        fecha_actual += timedelta(days=1)
 
-    return fecha_ingreso
+    return fecha_actual - timedelta(days=1)  # Restar un día para incluir la fecha de ingreso
 
+def calcular_prorroga(fecha_limite, dias_prorroga):
+    dias_habiles = 0
+    fecha_actual = fecha_limite  # Comenzar desde la fecha límite
+
+    while dias_habiles < dias_prorroga:
+        if fecha_actual.weekday() not in [5, 6]:
+            dias_habiles += 1
+        fecha_actual += timedelta(days=1)
+
+    return fecha_actual - timedelta(days=1)  # Restar un día para incluir la fecha límite
+
+def prorroga(request, id):
+    if request.method == "POST":
+        solicitud = get_object_or_404(Solicitud, id=id)
+        
+        if solicitud.prorroga_realizada:
+            return redirect('read')  # Ya se ha realizado una prórroga
+
+        dias_prorroga = int(request.POST['dias_prorroga'])
+        if dias_prorroga > 10:
+            dias_prorroga = 10
+        
+        nueva_fecha_limite = calcular_prorroga(solicitud.fecha_limite, dias_prorroga)
+        solicitud.fecha_limite = nueva_fecha_limite
+        solicitud.prorroga_realizada = True
+        solicitud.save()
+        return redirect('read')
+    else:
+        return redirect('read')
 
 @login_required
 def vista_previa_solicitud(request, id):

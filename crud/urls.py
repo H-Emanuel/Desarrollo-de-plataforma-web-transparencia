@@ -27,6 +27,7 @@ urlpatterns = [
     path('respuesta_edit/<int:id>', views.respuesta_edit, name="respuesta_edit"),
     
     path('amparo/<int:id>', views.respuesta, name="amparo"),
+    path('prorroga/<int:id>/', views.prorroga, name='prorroga'),
     
 
 ]

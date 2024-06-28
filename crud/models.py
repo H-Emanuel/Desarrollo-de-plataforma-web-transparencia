@@ -74,6 +74,7 @@ class Solicitud(models.Model):
 
     estado = models.CharField(max_length=100, blank=True, default='Sin responder')
     fecha_limite = models.DateField()
+    prorroga_realizada = models.BooleanField(default=False)  # VALIDADOR DE PRORROGA
     Departamento_admin = models.CharField(max_length=150, blank=True, default='',choices=DEPARTAMENTO_CHOICES_2, null=True) 
 
 

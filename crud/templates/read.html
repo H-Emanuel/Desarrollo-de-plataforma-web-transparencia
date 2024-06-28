@@ -43,84 +43,145 @@ th {
         
         <div style="display: flex; justify-content: center; margin: 0 auto;">
             <table id="tabla_fichas" class="display table table-striped table-bordered table-sm" style="width: 110%;">
-                    <thead>
+                <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Fecha de Ingreso</th>
+                        <th>Fecha de Ingreso al Portal de Transparencia</th>
                         <th>Fecha de Ingreso a Asesoria Urbana</th>
                         <th style="width: 150px;">Nombre y Apellido O Razón Social</th>
                         <th>N° Folio</th>
                         <th>Estado</th>
                         <th style="width: 280px;">Acciones</th>
                         <th class="invisible">Solicitud</th>
-                        <th >Respuesta</th>
-                        <th >Fecha Limite</th>
-                        <th >Departamento</th>
-
-
+                        <th>Respuesta</th>
+                        <th>Fecha Limite</th>
+                        <th>Departamento</th>
+                        <th>Días Restantes (Hábiles)</th> <!-- Nueva columna para los días restantes (solo días hábiles) -->
                     </tr>
                 </thead>
                 <tbody>
-                    {% for Solicitud, respuesta,Departamento in solicitud_respuesta_list %}
+                    {% for Solicitud, respuesta, Departamento in solicitud_respuesta_list %}
                     <tr>
-                            <td>{{ Solicitud.id }}</td>
-                            <td>{{ Solicitud.fecha_i_t }}</td>
-                            <td>{{ Solicitud.fecha_i_au }}</td>
-                            <td>{{ Solicitud.nombre_o_razon_social }}  {{ Solicitud.primer_apellido }}</td>
-                            <td>{{ Solicitud.N_transparencia }}</td>
-                            <td>{{ Solicitud.estado }}</td>
-                                                        
-                            <td> 
-                                <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Solicitud</a>                                
-                                {% if Solicitud.N_transparencia == 'C' %}
-                                    <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de Amparo</a>
-                                    {% if Solicitud.estado == "Respondida" %}
-                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Amparo</a>
-                                        <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Amparo</a>                            
-                                    {% endif %}
-                                {% else %}
-                                    {% if Solicitud.estado == "Respondida" %}
-                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
-                                        <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Editar Respuesta</a>
-                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de Amparo</a>
-                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Amparo</a>
-                                        <a href="#" class="btn btn-purple preview-res-prorroga-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">P-Prórroga</a>
-                                    {% else %}
-                                        <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de respuesta</a>
-                                    {% endif %}
-                                {% endif %}
-                            </td>
-                            
-
-                            <td class="invisible">{{ Solicitud.solicitud_text }}</td>
-                            <td class="respuesta">{{ respuesta.respuesta }}</td>
-                            <td>{{ Solicitud.fecha_limite }}</td>
-                            {% if departamento.nombre_departamento == 'ADMIN'%}
-
-                            <td>{{ Solicitud.Departamento_admin }}</td>
-
-                            {% else %}
-
-                                <td>{{ Departamento.nombre_departamento }}</td>
-
+                        <td>{{ Solicitud.id }}</td>
+                        <td>{{ Solicitud.fecha_i_t }}</td>
+                        <td>{{ Solicitud.fecha_i_au }}</td>
+                        <td>{{ Solicitud.nombre_o_razon_social }} {{ Solicitud.primer_apellido }}</td>
+                        <td>{{ Solicitud.N_transparencia }}</td>
+                        <td>{{ Solicitud.estado }}</td>
+            
+                        <td>
+                            <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}">Ver Solicitud</a>
+                            {% if Solicitud.N_transparencia == 'C' %}
+                            <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de Amparo</a>
+                            {% if Solicitud.estado == "Respondida" %}
+                            <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                            <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Amparo</a>
                             {% endif %}
+                            {% else %}
+                            {% if Solicitud.estado == "Respondida" %}
+                            <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }} " style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
+                            <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Editar Respuesta</a>
+                            <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de Amparo</a>
+                            <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Amparo</a>
+            
+                            {% if not Solicitud.prorroga_realizada %}
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                Solicitar Prórroga
+                            </button>
+                            {% else %}
+                            <button type="button" class="btn btn-secondary" disabled>
+                                Prórroga Realizada
+                            </button>
+                            {% endif %}
+            
+                            <!-- Modal para ingresar la cantidad de días de prórroga -->
+                            <div class="modal fade" id="prorrogaModal-{{ Solicitud.id }}" tabindex="-1" aria-labelledby="prorrogaModalLabel-{{ Solicitud.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="prorrogaModalLabel-{{ Solicitud.id }}">Solicitar Prórroga</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="prorrogaForm-{{ Solicitud.id }}" method="POST" action="{% url 'prorroga' Solicitud.id %}">
+                                                {% csrf_token %}
+                                                <div class="mb-3">
+                                                    <label for="diasProrroga-{{ Solicitud.id }}" class="form-label">Cantidad de días:</label>
+                                                    <input type="number" class="form-control" id="diasProrroga-{{ Solicitud.id }}" name="dias_prorroga" min="1" max="10" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Aceptar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de respuesta</a>
+                            {% endif %}
+                            {% endif %}
+                        </td>
+            
+                        <td class="invisible">{{ Solicitud.solicitud_text }}</td>
+                        <td class="respuesta">{{ respuesta.respuesta }}</td>
+                        <td>{{ Solicitud.fecha_limite }}</td>
+                        {% if departamento.nombre_departamento == 'ADMIN' %}
+                        <td>{{ Solicitud.Departamento_admin }}</td>
+                        {% else %}
+                        <td>{{ Departamento.nombre_departamento }}</td>
+                        {% endif %}
+            
+                        <td> <!-- Nueva columna para los días restantes (solo días hábiles) -->
+                            <script>
+                                function calcularDiasHabiles(fechaInicio, fechaFin) {
+                                    var fechaInicioMillis = new Date(fechaInicio).getTime();
+                                    var fechaFinMillis = new Date(fechaFin).getTime();
+                                    var diasHabiles = 0;
+            
+                                    while (fechaInicioMillis <= fechaFinMillis) {
+                                        var diaSemana = new Date(fechaInicioMillis).getDay();
+                                        if (diaSemana !== 0 && diaSemana !== 6) {
+                                            diasHabiles++;
+                                        }
+                                        fechaInicioMillis += 24 * 60 * 60 * 1000;
+                                    }
+            
+                                    return diasHabiles;
+                                }
+            
+                                var fechaLimite = '{{ Solicitud.fecha_limite }}';
+                                var diasHabilesRestantes = calcularDiasHabiles(new Date().toISOString().slice(0, 10), fechaLimite);
+            
+                                // Asignar color según los días restantes
+                                var color;
+                                var background_color;
+                                if (diasHabilesRestantes <= 5) {
+                                    color = 'white'; // Rojo si quedan 5 días hábiles o menos
+                                    background_color = 'red';
+                                } else if (diasHabilesRestantes <= 10) {
+                                    color = 'black'; // Amarillo si quedan entre 6 y 10 días hábiles
+                                    background_color = 'yellow';
 
+                                } else {
+                                    color = 'white'; // Verde si quedan más de 10 días hábiles
+                                    background_color = 'green';
 
-
-
-                        </tr>
+                                }
+            
+                                // Mostrar el número de días con el color correspondiente
+                                document.write('<span style="color: ' + color + ';background-color: ' + background_color + ';font-weight: bold;font-size: x-large;">' + diasHabilesRestantes + '</span>');
+                            </script>
+                        </td>
+                    </tr>
                     {% empty %}
-                        <tr>
-                            <td>No hay datos</td>
-                            <td>No hay datos</td>
-                            <td>No hay datos</td>
-                            <td>No hay datos</td>
-                            <td>No hay datos</td>
-
-                        </tr>
+                    <tr>
+                        <td colspan="11">No hay datos</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            
+            
+            
         </div>
     </div>
     <!-- Modal para mostrar la vista previa -->
