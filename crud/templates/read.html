@@ -79,7 +79,8 @@ th {
                             {% endif %}
                             {% else %}
                             {% if Solicitud.estado == "Respondida" %}
-                            <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }} " style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
+                            {% comment %} <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }} " style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a> {% endcomment %}
+                            <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
                             <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Editar Respuesta</a>
                             <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de Amparo</a>
                             <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Amparo</a>
@@ -198,6 +199,29 @@ th {
             </div>
         </div>
         </div>
+
+        <!-- Modal para mostrar la vista previa de la respuesta -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel">Vista previa de la respuesta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="previewData">
+                    <!-- Aquí se mostrarán los detalles de la respuesta -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+        
 
 
 </section>
@@ -336,35 +360,36 @@ previewLinks.forEach(function(link) {
                         var data = JSON.parse(xhr.responseText);
 
                         var previewDataText = '';
-                        if (Array.isArray(data.respuestas)) {
+                        if (data.respuestas) {
                             data.respuestas.forEach(function(respuesta, index) {
-                                previewDataText += 'Respuesta ' + (index + 1) + ': ' + respuesta.respuesta + '\n' +
-                                                   'Fecha DAJ: ' + respuesta.fecha_daj + '\n\n';
+                                previewDataText += 'Respuesta ' + (index + 1) + ': ' + respuesta.respuesta + '<br>' +
+                                                   'Fecha DAJ: ' + respuesta.fecha_daj + '<br>';
 
                                 // Si hay un archivo adjunto, agregar enlace de descarga
                                 if (respuesta.archivo_adjunto_url) {
-                                    previewDataText += '<br><a href="' + respuesta.archivo_adjunto_url + '" download>Descargar Archivo Folio</a><br>';
+                                    previewDataText += '<a href="' + respuesta.archivo_adjunto_url + '" download>Descargar Archivo Folio</a><br>';
                                 }
                                 if (respuesta.archivo_adjunto_url_2) {
-                                    previewDataText += '<br><a href="' + respuesta.archivo_adjunto_url_2 + '" download>Descargar Archivo Propuesta de respuesta</a><br>';
+                                    previewDataText += '<a href="' + respuesta.archivo_adjunto_url_2 + '" download>Descargar Archivo Propuesta de respuesta</a><br>';
                                 }
                                 if (respuesta.archivo_adjunto_url_3) {
-                                    previewDataText += '<br><a href="' + respuesta.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos,PDF, etc)</a><br>';
+                                    previewDataText += '<a href="' + respuesta.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos, PDF, etc)</a><br>';
                                 }
                                 previewDataText += '<hr>';
                             });
-                        } else {
-                            previewDataText = 'Fecha DAJ: ' + data.fecha_daj + '<br>' + 'Respuesta: ' + data.respuesta + '<br>';
-        
+                        } else if (data.respuesta) {
+                            previewDataText = 'Fecha DAJ: ' + data.fecha_daj + '<br>' +
+                                              'Respuesta: ' + data.respuesta + '<br>';
+
                             // Si hay un archivo adjunto, agregar enlace de descarga
                             if (data.archivo_adjunto_url) {
-                                previewDataText += '<br><a href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Folio</a><br>';
+                                previewDataText += '<a href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Folio</a><br>';
                             }
                             if (data.archivo_adjunto_url_2) {
-                                previewDataText += '<br><a href="' + data.archivo_adjunto_url_2 + '" download>Descargar Archivo Propuesta de respuesta</a><br>';
+                                previewDataText += '<a href="' + data.archivo_adjunto_url_2 + '" download>Descargar Archivo Propuesta de respuesta</a><br>';
                             }
                             if (data.archivo_adjunto_url_3) {
-                                previewDataText += '<br><a href="' + data.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos,PDF, etc)</a><br>';
+                                previewDataText += '<a href="' + data.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos, PDF, etc)</a><br>';
                             }
                         }
     

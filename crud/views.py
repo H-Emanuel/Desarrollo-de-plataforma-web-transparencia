@@ -8,9 +8,10 @@ from .models import *
 from datetime import datetime,timedelta
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from PyPDF2 import PdfMerger
+from PyPDF2 import PdfMerger, PdfReader  
 from django.core.files.base import ContentFile
 import io
+
 
 @login_required(login_url='/login/')
 def home(request):
@@ -211,14 +212,19 @@ def vista_previa_respuesta(request, id):
         }
     else:
         respuesta = Respuesta_solicitud.objects.filter(id_solicitud=id, tipo=tipo).last()
-        data = {
-            'respuesta': respuesta.respuesta,
-            'fecha_daj': respuesta.fecha_daj,
-            'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
-            'archivo_adjunto_url_2': respuesta.archivo_adjunto_2.url if respuesta.archivo_adjunto_2 else None,
-            'archivo_adjunto_url_3': respuesta.archivo_adjunto_3.url if respuesta.archivo_adjunto_3 else None,
-        }    
+        if respuesta:
+            data = {
+                'respuesta': respuesta.respuesta,
+                'fecha_daj': respuesta.fecha_daj,
+                'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
+                'archivo_adjunto_url_2': respuesta.archivo_adjunto_2.url if respuesta.archivo_adjunto_2 else None,
+                'archivo_adjunto_url_3': respuesta.archivo_adjunto_3.url if respuesta.archivo_adjunto_3 else None,
+            }
+        else:
+            data = {}
+    
     return JsonResponse(data)
+
 
 @login_required
 def respuesta(request, id=0):
@@ -352,33 +358,45 @@ def respuesta_edit(request, id=0):
 
     return render(request, 'crud_respuesta.html', data)
 
-def combinar_archivos_adjuntos(archivo_nuevo, archivo_viejo):
-    if archivo_nuevo:
-        pdf_merger = PdfMerger()
-        
-        # Agregar archivo nuevo
-        pdf_merger.append(archivo_nuevo)
 
-        if archivo_viejo:
-            # Agregar archivo viejo si existe
-            pdf_merger.append(archivo_viejo)
 
-        # Crear archivo PDF combinado en memoria
-        output_pdf = io.BytesIO()
-        pdf_merger.write(output_pdf)
-        pdf_merger.close()
+def combinar_archivos_adjuntos(archivos_nuevos, archivo_viejo):
+    pdf_merger = PdfMerger()
 
-        # Resetear el puntero al principio del archivo en memoria
-        output_pdf.seek(0)
+    # Función para cargar archivo PDF como PdfReader
+    def cargar_pdf_como_reader(archivo):
+        try:
+            reader = PdfReader(archivo)
+            if reader.is_encrypted:
+                raise ValueError("El archivo PDF está encriptado y no se puede combinar.")
+            return reader
+        except Exception as e:
+            raise ValueError(f"No se pudo cargar el archivo PDF: {e}")
 
-        # Generar un nombre único para el archivo usando un timestamp
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        nombre_archivo_comprimido = f"archivo_comprimido_{timestamp}.pdf"
+    # Combinar archivos nuevos si existen
+    for archivo_nuevo in archivos_nuevos:
+        if archivo_nuevo:
+            pdf_reader = cargar_pdf_como_reader(archivo_nuevo)
+            pdf_merger.append(pdf_reader)
 
-        # Crear un ContentFile para guardar en el modelo
-        pdf_comprimido = ContentFile(output_pdf.read(), name=nombre_archivo_comprimido)
-    else:
-        # Si no hay archivo nuevo, devolver el archivo viejo
-        pdf_comprimido = archivo_viejo
+    # Combinar archivo viejo si existe
+    if archivo_viejo:
+        pdf_reader_viejo = cargar_pdf_como_reader(archivo_viejo)
+        pdf_merger.append(pdf_reader_viejo)
+
+    # Crear archivo PDF combinado en memoria
+    output_pdf = io.BytesIO()
+    pdf_merger.write(output_pdf)
+    pdf_merger.close()
+
+    # Resetear el puntero al principio del archivo en memoria
+    output_pdf.seek(0)
+
+    # Generar un nombre único para el archivo usando un timestamp
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    nombre_archivo_comprimido = f"archivo_comprimido_{timestamp}.pdf"
+
+    # Crear un ContentFile para guardar en el modelo
+    pdf_comprimido = ContentFile(output_pdf.read(), name=nombre_archivo_comprimido)
 
     return pdf_comprimido
