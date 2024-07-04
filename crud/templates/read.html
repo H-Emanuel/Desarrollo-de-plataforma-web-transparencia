@@ -39,24 +39,24 @@ th {
 </style>
 <section class="container">
     <br>
-    <div class="row">
+    <div class="row" style="width: 100%;">
         
-        <div style="display: flex; justify-content: center; margin: 0 auto;">
-            <table id="tabla_fichas" class="display table table-striped table-bordered table-sm" style="width: 110%;">
+        <div style="display: flex; justify-content: center;">
+            <table id="tabla_fichas" class="display table table-striped table-bordered table-sm" style="width: 100%;">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Fecha de Ingreso al Portal de Transparencia</th>
-                        <th>Fecha de Ingreso a Asesoria Urbana</th>
-                        <th style="width: 150px;">Nombre y Apellido O Razón Social</th>
-                        <th>N° Folio</th>
+                        <th style="width: 105px;">Ingreso a Portal de Trans.</th>
+                        <th style="width: 110px;">Ingreso a Asesoria Urbana</th>
+                        <th style="width: 150px;">Nombre y Apellido / Razón Social</th>
+                        <th style="width: 50px;">N° Folio</th>
                         <th>Estado</th>
-                        <th style="width: 280px;">Acciones</th>
+                        <th class="th_buttons">Acciones</th>
                         <th class="invisible">Solicitud</th>
                         <th>Respuesta</th>
                         <th>Fecha Limite</th>
-                        <th>Departamento</th>
-                        <th>Días Restantes (Hábiles)</th> <!-- Nueva columna para los días restantes (solo días hábiles) -->
+                        <th style="width: 115px;">Departamento</th>
+                        <th style="width: 60px;">Días Rest. (Hábiles)</th> <!-- Nueva columna para los días restantes (solo días hábiles) -->
                     </tr>
                 </thead>
                 <tbody>
@@ -69,32 +69,52 @@ th {
                         <td>{{ Solicitud.N_transparencia }}</td>
                         <td>{{ Solicitud.estado }}</td>
             
-                        <td>
-                            <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}">Ver Solicitud</a>
-                            {% if Solicitud.N_transparencia == 'C' %}
-                            <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de Amparo</a>
-                            {% if Solicitud.estado == "Respondida" %}
-                            <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
-                            <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">P-Editar Amparo</a>
-                            {% endif %}
+                        <td class="td_buttons">
+                            <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}">Ver Solicitud</a>                  
+                        
+                            {% if Solicitud.N_transparencia|slice:":1" == 'C' %}
+                                <!-- Botones para solicitudes de tipo amparo -->
+                                {% if Solicitud.estado == 'Sin responder' %}
+                                    <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                {% elif Solicitud.estado == 'Amparado' %}
+                                    <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                    <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                {% endif %}
                             {% else %}
-                            {% if Solicitud.estado == "Respondida" %}
-                            {% comment %} <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }} " style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a> {% endcomment %}
-                            <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Respuesta</a>
-                            <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Editar Respuesta</a>
-                            <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de Amparo</a>
-                            <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}" style="margin-top: 10px; margin-bottom: 10px;">Ver Propuesta Amparo</a>
-            
-                            {% if not Solicitud.prorroga_realizada %}
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
-                                Solicitar Prórroga
-                            </button>
-                            {% else %}
-                            <button type="button" class="btn btn-secondary" disabled>
-                                Prórroga Realizada
-                            </button>
+                                <!-- Botones para solicitudes de tipo normal -->
+                                {% if Solicitud.estado == 'Sin responder' %}
+                                    <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple">Propuesta de respuesta</a>
+                                {% elif Solicitud.estado == 'Respondida' %}
+                                    <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
+                                    <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple">Editar Propuesta de Respuesta</a>
+                                    <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                    <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                    {% if not Solicitud.prorroga_realizada %}
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                            Solicitar Prórroga
+                                        </button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-secondary" disabled>
+                                            Prórroga Realizada
+                                        </button>
+                                    {% endif %}
+                                {% elif Solicitud.estado == 'Amparado' %}
+                                    <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
+                                    <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple">Editar Propuesta de Respuesta</a>
+                                    <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                    <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                    {% if not Solicitud.prorroga_realizada %}
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                            Solicitar Prórroga
+                                        </button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-secondary" disabled>
+                                            Prórroga Realizada
+                                        </button>
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
-            
+                        
                             <!-- Modal para ingresar la cantidad de días de prórroga -->
                             <div class="modal fade" id="prorrogaModal-{{ Solicitud.id }}" tabindex="-1" aria-labelledby="prorrogaModalLabel-{{ Solicitud.id }}" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -116,11 +136,9 @@ th {
                                     </div>
                                 </div>
                             </div>
-                            {% else %}
-                            <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple" style="margin-top: 10px; margin-bottom: 10px;">Propuesta de respuesta</a>
-                            {% endif %}
-                            {% endif %}
                         </td>
+                        
+                        
             
                         <td class="invisible">{{ Solicitud.solicitud_text }}</td>
                         <td class="respuesta">{{ respuesta.respuesta }}</td>
@@ -131,13 +149,13 @@ th {
                         <td>{{ Departamento.nombre_departamento }}</td>
                         {% endif %}
             
-                        <td> <!-- Nueva columna para los días restantes (solo días hábiles) -->
+                        <td class="td_dias_restantes"> <!-- Nueva columna para los días restantes (solo días hábiles) -->
                             <script>
                                 function calcularDiasHabiles(fechaInicio, fechaFin) {
                                     var fechaInicioMillis = new Date(fechaInicio).getTime();
                                     var fechaFinMillis = new Date(fechaFin).getTime();
                                     var diasHabiles = 0;
-            
+                        
                                     while (fechaInicioMillis <= fechaFinMillis) {
                                         var diaSemana = new Date(fechaInicioMillis).getDay();
                                         if (diaSemana !== 0 && diaSemana !== 6) {
@@ -145,33 +163,36 @@ th {
                                         }
                                         fechaInicioMillis += 24 * 60 * 60 * 1000;
                                     }
-            
+                        
                                     return diasHabiles;
                                 }
-            
+                        
                                 var fechaLimite = '{{ Solicitud.fecha_limite }}';
                                 var diasHabilesRestantes = calcularDiasHabiles(new Date().toISOString().slice(0, 10), fechaLimite);
-            
+                        
                                 // Asignar color según los días restantes
                                 var color;
                                 var background_color;
-                                if (diasHabilesRestantes <= 5) {
+                                if (diasHabilesRestantes <= 4) {
                                     color = 'white'; // Rojo si quedan 5 días hábiles o menos
-                                    background_color = 'red';
-                                } else if (diasHabilesRestantes <= 10) {
+                                    background_color = '#E73C45';
+                                } else if (diasHabilesRestantes <= 9) {
                                     color = 'black'; // Amarillo si quedan entre 6 y 10 días hábiles
-                                    background_color = 'yellow';
-
+                                    background_color = '#F7EA53';
                                 } else {
                                     color = 'white'; // Verde si quedan más de 10 días hábiles
-                                    background_color = 'green';
-
+                                    background_color = '#4BBFE0';
                                 }
-            
-                                // Mostrar el número de días con el color correspondiente
-                                document.write('<span style="color: ' + color + ';background-color: ' + background_color + ';font-weight: bold;font-size: x-large;">' + diasHabilesRestantes + '</span>');
+                        
+                                // Mostrar el número de días con el color correspondiente y aplicar clase
+                                var diasRestantesElement = document.currentScript.parentElement;
+                                diasRestantesElement.style.backgroundColor = background_color;
+                                diasRestantesElement.style.color = color;
+                                diasRestantesElement.classList.add('dias-' + (diasHabilesRestantes <= 5 ? 'urgente' : (diasHabilesRestantes <= 10 ? 'alerta' : 'normal')));
+                                diasRestantesElement.innerHTML = diasHabilesRestantes;
                             </script>
                         </td>
+                        
                     </tr>
                     {% empty %}
                     <tr>
@@ -218,79 +239,103 @@ th {
         </div>
     </div>
 
-
-
-
-        
-
-
 </section>
 {% endblock main_content %}
 
 {% block custom_js %}
+
+
 <script>
-$(document).ready(function () {
-    var tabla = $('#tabla_fichas').DataTable({
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.12.1/i18n/es-CL.json'
-        },
-        
-        initComplete: function () {
-            $("#tabla_fichas").show();
+    $(document).ready(function () {
+        function procesarContenidoExtendido() {
             $('.respuesta').each(function () {
-                var contenido = $(this).text().trim();
-                if (contenido.length > 250) {
-                    var recortado = contenido.substring(0, 250);
-                    var restante = contenido.substring(250);
-                    $(this).html(recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>');
+                var $respuesta = $(this);
+                var contenido = $respuesta.data('original-text');
+                
+                if (!contenido) {
+                    contenido = $respuesta.text().trim();
+                    $respuesta.data('original-text', contenido);
+                }
+    
+                if (contenido.length > 170) {
+                    var recortado = contenido.substring(0, 170);
+                    var restante = contenido.substring(170);
+                    $respuesta.html(recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>');
+                } else {
+                    $respuesta.html(contenido);
                 }
             });
-        },
-        // rowCallback para resaltar la palabra buscada
-        "rowCallback": function (row, data, index) {
-    var searchTerm = $('#tabla_fichas_filter input').val().trim();
-    if (searchTerm !== '') {
-        var regex = new RegExp('(' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')', 'ig');
-        $(row).find('.respuesta').each(function() {
-            var originalText = $(this).data('original-text');
-            if (!originalText) {
-                originalText = $(this).text();
-                $(this).data('original-text', originalText);
+        }
+    
+        function resaltarPalabrasBuscadas() {
+            var searchTerm = $('#tabla_fichas_filter input').val().trim();
+            if (searchTerm !== '') {
+                var regex = new RegExp('(' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')', 'ig');
+                $('.respuesta').each(function() {
+                    var originalText = $(this).data('original-text');
+                    if (!originalText) {
+                        originalText = $(this).text();
+                        $(this).data('original-text', originalText);
+                    }
+                    var highlightedText = originalText.replace(regex, '<span class="resaltado">$1</span>');
+                    var contenidoLength = originalText.length;
+                    if (contenidoLength > 250) {
+                        var recortado = highlightedText.substring(0, 250);
+                        var restante = highlightedText.substring(250);
+                        $(this).html(recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>');
+                    } else {
+                        $(this).html(highlightedText);
+                    }
+                });
+            } else {
+                procesarContenidoExtendido();
             }
-            $(this).html(originalText.replace(regex, '<span class="resaltado">$1</span>'));
-        });
-    } else {
-        $(row).find('.respuesta').each(function() {
-            var originalText = $(this).data('original-text');
-            if (originalText) {
-                $(this).html(originalText);
+        }
+    
+        var tabla = $('#tabla_fichas').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.12.1/i18n/es-CL.json'
+            },
+            initComplete: function () {
+                $("#tabla_fichas").show();
+                procesarContenidoExtendido();
+            },
+            drawCallback: function () {
+                resaltarPalabrasBuscadas();
+            },
+            "rowCallback": function (row, data, index) {
+                resaltarPalabrasBuscadas();
             }
         });
-    }
-}
+    
+        // Filtrar la tabla cuando se realiza una búsqueda
+        $('#tabla_fichas_filter input').on('keyup', function () {
+            tabla.search(this.value).draw();
+        });
+    
+        // Delegación de eventos para mostrar y ocultar más texto
+        $('#tabla_fichas tbody').on('click', '.enlace-mostrar', function (e) {
+            e.preventDefault();
+            var $respuesta = $(this).closest('.respuesta');
+            $respuesta.find('.texto-restante').show();
+            $respuesta.find('.mostrar-mas').hide();
+        });
+    
+        $('#tabla_fichas tbody').on('click', '.enlace-ocultar', function (e) {
+            e.preventDefault();
+            var $respuesta = $(this).closest('.respuesta');
+            $respuesta.find('.texto-restante').hide();
+            $respuesta.find('.mostrar-mas').show();
+    
+            // Volver a la posición inicial de la respuesta
+            $respuesta[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
     });
-
-    // Filtrar la tabla cuando se realiza una búsqueda
-    $('#tabla_fichas_filter input').on('keyup', function () {
-        tabla.search(this.value).draw();
-    });
-
-    // Delegación de eventos para mostrar y ocultar más texto
-    $('#tabla_fichas tbody').on('click', '.enlace-mostrar', function (e) {
-        e.preventDefault();
-        $(this).closest('.respuesta').find('.texto-restante').show();
-        $(this).closest('.mostrar-mas').hide();
-    });
-
-    $('#tabla_fichas tbody').on('click', '.enlace-ocultar', function (e) {
-        e.preventDefault();
-        $(this).closest('.respuesta').find('.texto-restante').hide();
-        $(this).closest('.respuesta').find('.mostrar-mas').show();
-    });
-});
 </script>
     
+      
     
+
 
 <script>
 var previewLinks = document.querySelectorAll('.preview-link');
@@ -375,6 +420,8 @@ previewLinks.forEach(function(link) {
                                 if (respuesta.archivo_adjunto_url_3) {
                                     previewDataText += '<a href="' + respuesta.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos, PDF, etc)</a><br>';
                                 }
+                                previewDataText += '<a href="respuesta_edit/' + respuesta.id + '" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
+
                                 previewDataText += '<hr>';
                             });
                         } else if (data.respuesta) {

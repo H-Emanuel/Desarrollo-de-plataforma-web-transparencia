@@ -21,14 +21,9 @@ urlpatterns = [
     path('crear', views.home, name="crear"),
     path('read', views.read, name="read"),
     path('vista_previa_solicitud/<int:id>', views.vista_previa_solicitud, name="vista_previa_solicitud"),
-    # path('vista_previa_respuesta/<int:id>', views.vista_previa_respuesta, name="vista_previa_respuesta"),
     path('vista_previa_respuesta/<int:id>/', views.vista_previa_respuesta, name='vista_previa_respuesta'),
-
-    path('respuesta/<int:id>', views.respuesta, name="respuesta"),
+    path('respuesta/<int:id>', views.respuesta, name="respuesta"),    
     path('respuesta_edit/<int:id>', views.respuesta_edit, name="respuesta_edit"),
-    
     path('amparo/<int:id>', views.respuesta, name="amparo"),
     path('prorroga/<int:id>/', views.prorroga, name='prorroga'),
-    
-
 ]

@@ -51,7 +51,9 @@ def home(request):
         nombre_o_razon_social = request.POST['nombre_o_razon_social']
         primer_apellido = request.POST['primer_apellido']
         segundo_apellido = request.POST['segundo_apellido']
-        fecha_limite = calcular_fecha_limite(fecha_ingreso_t)
+
+        # Calcular la fecha límite según el tipo de solicitud
+        fecha_limite = calcular_fecha_limite(fecha_ingreso_t, N_transparencia[0])
 
         if departamento_usuario.nombre_departamento == "ADMIN":
             Departamento_admin = request.POST['departamento_admin']
@@ -123,13 +125,16 @@ def read(request):
 
 
 
-def calcular_fecha_limite(fecha_ingreso):
+def calcular_fecha_limite(fecha_ingreso, tipo_solicitud):
     # Contador para llevar la cuenta de los días hábiles
     dias_habiles = 0
     fecha_actual = fecha_ingreso  # Comenzar desde la fecha de ingreso
 
+    # Determinar el número de días hábiles según el tipo de solicitud
+    dias_limite = 13 if tipo_solicitud != 'C' else 10
+
     # Bucle para encontrar la fecha límite
-    while dias_habiles < 13:
+    while dias_habiles < dias_limite:
         # Si es sábado o domingo, no se cuentan como días hábiles
         if fecha_actual.weekday() not in [5, 6]:
             dias_habiles += 1
@@ -202,6 +207,7 @@ def vista_previa_respuesta(request, id):
         data = {
             'respuestas': [
                 {
+                    'id': respuesta.id,
                     'respuesta': respuesta.respuesta,
                     'fecha_daj': respuesta.fecha_daj,
                     'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
@@ -214,6 +220,7 @@ def vista_previa_respuesta(request, id):
         respuesta = Respuesta_solicitud.objects.filter(id_solicitud=id, tipo=tipo).last()
         if respuesta:
             data = {
+                'id': respuesta.id,
                 'respuesta': respuesta.respuesta,
                 'fecha_daj': respuesta.fecha_daj,
                 'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
@@ -274,13 +281,18 @@ def respuesta(request, id=0):
             tipo=tipo_respuesta
         )
 
-        # Actualizar el estado de la solicitud a "Respondida"
-        solicitud.estado = "Respondida"
+        # Actualizar el estado de la solicitud a "Amparado" si es tipo amparo, de lo contrario a "Respondida"
+        if tipo_respuesta == 'A':
+            solicitud.estado = "Amparado"
+        else:
+            solicitud.estado = "Respondida"
+        
         solicitud.save()
 
         return redirect('read')
     
     return render(request, 'crud_respuesta.html', data)
+
 
 def procesar_archivos_adjuntos(archivos_adjuntos):
     pdf_merger = PdfMerger()

@@ -1,12 +1,44 @@
 .btn {
     display: inline-block;
-    padding: 10px 20px;
+    padding: 10px 5px;
     border: none;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 15px;
     color: #fff;
     text-decoration: none;
-    transition: background-color 0.2s; width: 250px;
+    transition: background-color 0.2s;
+    width: 215px; /* Asegúrate de que el ancho sea apropiado para el contenedor */
+    margin-top: 2.5px;
+    margin-bottom: 2.5px;
+    margin-left: 5px;
+    
+}
+
+
+tbody .td_dias_restantes {
+    padding: 5px; /* Ajusta según necesites */
+    font-size: x-large;
+    font-weight: bold;
+    text-align: center; /* Centra horizontalmente */
+    vertical-align: middle; /* Centra verticalmente */
+
+}
+
+/* Estilos según el estado de los días restantes */
+tbody .td_dias_restantes.dias-urgente {
+    color: white;
+}
+
+tbody .td_dias_restantes.dias-alerta {
+    color: black;
+}
+
+tbody .td_dias_restantes.dias-normal {
+    color: white;
+}
+
+table.dataTable.table-striped>tbody>tr.odd>td.td_dias_restantes  {
+    box-shadow: none;
 }
 
 /* Estilos específicos para el botón púrpura */
@@ -17,4 +49,21 @@
 /* Cambio de color al pasar el mouse */
 .btn:hover {
     background-color: #414141; /* Púrpura más claro */
+}
+
+
+.row {
+    width: 100%;
+}
+
+#tabla_fichas_wrapper {
+    width: 100%;
+
+}
+
+
+@media (min-width: 1600px) {
+    .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+        max-width: 1500px;
+    }
 }
