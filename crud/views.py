@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -91,6 +92,7 @@ def home(request):
 
 
 @login_required  # Asegura que el usuario esté autenticado para acceder a esta vista
+
 def read(request):
     user = request.user
     departamento_usuario = Departamento.objects.filter(id_usuario=user).first()
@@ -108,11 +110,15 @@ def read(request):
         solicitud_respuesta_list = []
         for solicitud in Solicitud.objects.filter(id_usuario=user):
             try:
-                # Intentar obtener la respuesta asociada a esta Solicitud
-                respuesta = Respuesta_solicitud.objects.get(id_solicitud=solicitud)
+                # Intentar obtener la primera respuesta asociada a esta Solicitud
+                respuesta = Respuesta_solicitud.objects.filter(id_solicitud=solicitud).first()
             except Respuesta_solicitud.DoesNotExist:
                 # Si no hay respuesta asociada, asignar None
                 respuesta = None
+            except MultipleObjectsReturned:
+                # Si hay múltiples respuestas, tomar la primera que entró
+                respuesta = Respuesta_solicitud.objects.filter(id_solicitud=solicitud).first()
+            
             departamento_origen = Departamento.objects.filter(id_usuario=solicitud.id_usuario).first()
             solicitud_respuesta_list.append((solicitud, respuesta, departamento_origen))
 
@@ -122,6 +128,7 @@ def read(request):
     }
 
     return render(request, 'read.html', data)
+
 
 
 
@@ -202,6 +209,15 @@ def vista_previa_solicitud(request, id):
 @login_required
 def vista_previa_respuesta(request, id):
     tipo = request.GET.get('tipo')
+    user = request.user
+    
+    # Obtener el departamento del usuario actual
+    try:
+        departamento_usuario = Departamento.objects.get(id_usuario=user)
+        nombre_departamento = departamento_usuario.nombre_departamento
+    except Departamento.DoesNotExist:
+        nombre_departamento = None
+
     if tipo == 'A':
         respuestas = Respuesta_solicitud.objects.filter(id_solicitud=id, tipo=tipo).order_by('fecha_daj')
         data = {
@@ -214,7 +230,8 @@ def vista_previa_respuesta(request, id):
                     'archivo_adjunto_url_2': respuesta.archivo_adjunto_2.url if respuesta.archivo_adjunto_2 else None,
                     'archivo_adjunto_url_3': respuesta.archivo_adjunto_3.url if respuesta.archivo_adjunto_3 else None,
                 } for respuesta in respuestas
-            ]
+            ],
+            'departamento': nombre_departamento  # Agregar el nombre del departamento al JSON
         }
     else:
         respuesta = Respuesta_solicitud.objects.filter(id_solicitud=id, tipo=tipo).last()
@@ -226,11 +243,15 @@ def vista_previa_respuesta(request, id):
                 'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
                 'archivo_adjunto_url_2': respuesta.archivo_adjunto_2.url if respuesta.archivo_adjunto_2 else None,
                 'archivo_adjunto_url_3': respuesta.archivo_adjunto_3.url if respuesta.archivo_adjunto_3 else None,
+                'departamento': nombre_departamento  # Agregar el nombre del departamento al JSON
             }
         else:
-            data = {}
+            data = {
+                'departamento': nombre_departamento  # Incluso si no hay respuesta, enviar el nombre del departamento
+            }
     
     return JsonResponse(data)
+
 
 
 @login_required
@@ -281,9 +302,9 @@ def respuesta(request, id=0):
             tipo=tipo_respuesta
         )
 
-        # Actualizar el estado de la solicitud a "Amparado" si es tipo amparo, de lo contrario a "Respondida"
+        # Actualizar el estado de la solicitud a "Amparo Respondido" si es tipo amparo, de lo contrario a "Respondida"
         if tipo_respuesta == 'A':
-            solicitud.estado = "Amparado"
+            solicitud.estado = "Amparo Respondido"
         else:
             solicitud.estado = "Respondida"
         

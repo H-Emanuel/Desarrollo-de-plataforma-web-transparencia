@@ -7,7 +7,7 @@
     color: #fff;
     text-decoration: none;
     transition: background-color 0.2s;
-    width: 215px; /* Asegúrate de que el ancho sea apropiado para el contenedor */
+    width: 220px; /* Asegúrate de que el ancho sea apropiado para el contenedor */
     margin-top: 2.5px;
     margin-bottom: 2.5px;
     margin-left: 5px;
@@ -24,6 +24,23 @@ tbody .td_dias_restantes {
 
 }
 
+@font-face {
+    font-family: 'HelveticaNeueRoman';
+    src: url('fonts/HelveticaNeueRoman.otf') format('opentype');
+    /* Puedes añadir más formatos como woff, woff2, ttf si es necesario */
+}
+
+body {
+    font-family: 'HelveticaNeueRoman', sans-serif;
+}
+
+h1 {
+    font-family: 'Trebuchet MS', sans-serif;
+}
+
+.modal-body {
+    text-align: justify;    
+}
 /* Estilos según el estado de los días restantes */
 tbody .td_dias_restantes.dias-urgente {
     color: white;
@@ -65,5 +82,11 @@ table.dataTable.table-striped>tbody>tr.odd>td.td_dias_restantes  {
 @media (min-width: 1600px) {
     .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
         max-width: 1500px;
+    }
+}
+
+@media (min-width: 1366px) {
+    .modal-dialog {
+        min-width: 800px;        
     }
 }

@@ -72,45 +72,90 @@ th {
                         <td class="td_buttons">
                             <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}">Ver Solicitud</a>                  
                         
-                            {% if Solicitud.N_transparencia|slice:":1" == 'C' %}
-                                <!-- Botones para solicitudes de tipo amparo -->
-                                {% if Solicitud.estado == 'Sin responder' %}
-                                    <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
-                                {% elif Solicitud.estado == 'Amparado' %}
-                                    <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
-                                    <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                            {% if departamento.nombre_departamento == 'ADMIN' %}
+                                <!-- Botones para ADMIN -->
+                                {% if Solicitud.N_transparencia|slice:":1" == 'C' %}
+                                    <!-- Botones para solicitudes de tipo amparo -->
+                                    {% if Solicitud.estado == 'Sin responder' %}
+                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                    {% elif Solicitud.estado == 'Amparo Respondido' %}
+                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                    {% endif %}
+                                {% else %}
+                                    <!-- Botones para solicitudes de tipo normal -->
+                                    {% if Solicitud.estado == 'Sin responder' %}
+                                        <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple">Propuesta de respuesta</a>
+                                    {% elif Solicitud.estado == 'Respondida' %}
+                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
+                                        <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple">Editar Propuesta de Respuesta</a>
+                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                        {% if not Solicitud.prorroga_realizada %}
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                                Solicitar Prórroga
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                Prórroga Realizada
+                                            </button>
+                                        {% endif %}
+                                    {% elif Solicitud.estado == 'Amparo Respondido' %}
+                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
+                                        <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple">Editar Propuesta de Respuesta</a>
+                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                        {% if not Solicitud.prorroga_realizada %}
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                                Solicitar Prórroga
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                Prórroga Realizada
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
                                 {% endif %}
                             {% else %}
-                                <!-- Botones para solicitudes de tipo normal -->
-                                {% if Solicitud.estado == 'Sin responder' %}
-                                    <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple">Propuesta de respuesta</a>
-                                {% elif Solicitud.estado == 'Respondida' %}
-                                    <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
-                                    <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple">Editar Propuesta de Respuesta</a>
-                                    <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
-                                    <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
-                                    {% if not Solicitud.prorroga_realizada %}
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
-                                            Solicitar Prórroga
-                                        </button>
-                                    {% else %}
-                                        <button type="button" class="btn btn-secondary" disabled>
-                                            Prórroga Realizada
-                                        </button>
+                                <!-- Botones para otros departamentos -->
+                                {% if Solicitud.N_transparencia|slice:":1" == 'C' %}
+                                    <!-- Botones para solicitudes de tipo amparo -->
+                                    {% if Solicitud.estado == 'Sin responder' %}
+                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                    {% elif Solicitud.estado == 'Amparo Respondido' %}
+                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
                                     {% endif %}
-                                {% elif Solicitud.estado == 'Amparado' %}
-                                    <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
-                                    <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple">Editar Propuesta de Respuesta</a>
-                                    <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
-                                    <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
-                                    {% if not Solicitud.prorroga_realizada %}
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
-                                            Solicitar Prórroga
-                                        </button>
-                                    {% else %}
-                                        <button type="button" class="btn btn-secondary" disabled>
-                                            Prórroga Realizada
-                                        </button>
+                                {% else %}
+                                    <!-- Botones para solicitudes de tipo normal -->
+                                    {% if Solicitud.estado == 'Sin responder' %}
+                                        <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple">Propuesta de respuesta</a>
+                                    {% elif Solicitud.estado == 'Respondida' %}
+                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
+                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                        {% if not Solicitud.prorroga_realizada %}
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                                Solicitar Prórroga
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                Prórroga Realizada
+                                            </button>
+                                        {% endif %}
+                                    {% elif Solicitud.estado == 'Amparo Respondido' %}
+                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
+                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                        {% if not Solicitud.prorroga_realizada %}
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                                Solicitar Prórroga
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                Prórroga Realizada
+                                            </button>
+                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
@@ -137,6 +182,7 @@ th {
                                 </div>
                             </div>
                         </td>
+                        
                         
                         
             
@@ -420,7 +466,10 @@ previewLinks.forEach(function(link) {
                                 if (respuesta.archivo_adjunto_url_3) {
                                     previewDataText += '<a href="' + respuesta.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos, PDF, etc)</a><br>';
                                 }
-                                previewDataText += '<a href="respuesta_edit/' + respuesta.id + '" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
+                                                                
+                                if (data.departamento && data.departamento === 'ADMIN') {
+                                    previewDataText += '<a href="respuesta_edit/' + respuesta.id + '" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
+                                }
 
                                 previewDataText += '<hr>';
                             });
@@ -437,6 +486,11 @@ previewLinks.forEach(function(link) {
                             }
                             if (data.archivo_adjunto_url_3) {
                                 previewDataText += '<a href="' + data.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos, PDF, etc)</a><br>';
+                            }
+
+                            // Verificar si el usuario es ADMIN para mostrar el botón de edición
+                            if (data.departamento && data.departamento === 'ADMIN') {
+                                previewDataText += '<a href="respuesta_edit/' + data.respuesta.id + '" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
                             }
                         }
     
@@ -455,6 +509,7 @@ previewLinks.forEach(function(link) {
     addPreviewEventListener('.preview-res-amparo-link', 'A');
     addPreviewEventListener('.preview-res-respuesta-link', 'R');
 </script>
+
 
 
 
