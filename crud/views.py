@@ -253,68 +253,6 @@ def vista_previa_respuesta(request, id):
     return JsonResponse(data)
 
 
-
-@login_required
-def respuesta(request, id=0):
-    solicitud = get_object_or_404(Solicitud, id=id)
-    Titulo = "CREACIÓN"
-
-    # Obtener el tipo de respuesta desde los parámetros de la URL o establecer un valor por defecto
-    tipo_respuesta = request.GET.get('tipo', 'R')
-
-    data = {
-        'solicitud': solicitud,
-        'Titulo': Titulo,
-        'tipo': tipo_respuesta  # Pasamos el tipo de respuesta al contexto
-    }
-
-    if request.method == 'POST':
-        fecha_daj = request.POST['Fecha_ingreso_DAJ']
-        respuesta_text = request.POST['respuesta']
-
-        try:
-            archivos_adjuntos_1 = request.FILES.getlist('archivo_adjunto')
-        except KeyError:
-            archivos_adjuntos_1 = None
-
-        try:
-            archivos_adjuntos_2 = request.FILES.getlist('archivo_adjunto_2')
-        except KeyError:
-            archivos_adjuntos_2 = None
-
-        try:
-            archivos_adjuntos_3 = request.FILES.getlist('archivo_adjunto_3')
-        except KeyError:
-            archivos_adjuntos_3 = None
-
-        pdf_comprimido_1 = procesar_archivos_adjuntos(archivos_adjuntos_1)
-        pdf_comprimido_3 = procesar_archivos_adjuntos(archivos_adjuntos_3)
-
-
-        # Crear la respuesta de la solicitud
-        Respuesta_solicitud.objects.create(
-            fecha_daj=fecha_daj,
-            id_solicitud=solicitud,
-            respuesta=respuesta_text,
-            archivo_adjunto=pdf_comprimido_1,
-            archivo_adjunto_2=archivos_adjuntos_2,
-            archivo_adjunto_3=pdf_comprimido_3,
-            tipo=tipo_respuesta
-        )
-
-        # Actualizar el estado de la solicitud a "Amparo Respondido" si es tipo amparo, de lo contrario a "Respondida"
-        if tipo_respuesta == 'A':
-            solicitud.estado = "Amparo Respondido"
-        else:
-            solicitud.estado = "Respondida"
-        
-        solicitud.save()
-
-        return redirect('read')
-    
-    return render(request, 'crud_respuesta.html', data)
-
-
 def procesar_archivos_adjuntos(archivos_adjuntos):
     pdf_merger = PdfMerger()
     any_pdf_added = False
@@ -340,57 +278,6 @@ def procesar_archivos_adjuntos(archivos_adjuntos):
         pdf_comprimido = None
 
     return pdf_comprimido
-
-
-@login_required
-def respuesta_edit(request, id=0):
-    Titulo = "EDICION"
-    respuesta = get_object_or_404(Respuesta_solicitud, id=id)
-
-    data = {
-        'Respuesta': respuesta,
-        'Titulo': Titulo
-    }
-
-    if request.method == 'POST':
-        fecha_daj = request.POST['Fecha_ingreso_DAJ']
-        respuesta_text = request.POST['respuesta']
-
-        try:
-            archivos_adjuntos_1 = request.FILES.getlist('archivo_adjunto')
-        except KeyError:
-            archivos_adjuntos_1 = None
-
-        try:
-            archivos_adjuntos_2 = request.FILES.getlist('archivo_adjunto_2')
-        except KeyError:
-            archivos_adjuntos_2 = None
-
-        try:
-            archivos_adjuntos_3 = request.FILES.getlist('archivo_adjunto_3')
-        except KeyError:
-            archivos_adjuntos_3 = None
-
-        # pdf_comprimido_1 = procesar_archivos_adjuntos(archivos_adjuntos_1)
-        # pdf_comprimido_2 = procesar_archivos_adjuntos(archivos_adjuntos_2)
-        # pdf_comprimido_3 = procesar_archivos_adjuntos(archivos_adjuntos_3)
-
-        # Combinar archivos nuevos con los antiguos
-        archivo_adjunto_combinado = combinar_archivos_adjuntos(archivos_adjuntos_1, respuesta.archivo_adjunto)
-        archivo_adjunto_3_combinado = combinar_archivos_adjuntos(archivos_adjuntos_3, respuesta.archivo_adjunto_3)
-
-        # Actualizar la respuesta de la solicitud
-        respuesta.fecha_daj = fecha_daj
-        respuesta.respuesta = respuesta_text
-        respuesta.archivo_adjunto = archivo_adjunto_combinado
-        respuesta.archivo_adjunto_2 = archivos_adjuntos_2
-        respuesta.archivo_adjunto_3 = archivo_adjunto_3_combinado
-        respuesta.save()
-
-        return redirect('read')
-
-    return render(request, 'crud_respuesta.html', data)
-
 
 
 def combinar_archivos_adjuntos(archivos_nuevos, archivo_viejo):
@@ -433,3 +320,108 @@ def combinar_archivos_adjuntos(archivos_nuevos, archivo_viejo):
     pdf_comprimido = ContentFile(output_pdf.read(), name=nombre_archivo_comprimido)
 
     return pdf_comprimido
+
+@login_required
+def respuesta(request, id=0):
+    solicitud = get_object_or_404(Solicitud, id=id)
+    Titulo = "CREACIÓN"
+
+    # Obtener el tipo de respuesta desde los parámetros de la URL o establecer un valor por defecto
+    tipo_respuesta = request.GET.get('tipo', 'R')
+
+    data = {
+        'solicitud': solicitud,
+        'Titulo': Titulo,
+        'tipo': tipo_respuesta  # Pasamos el tipo de respuesta al contexto
+    }
+
+    if request.method == 'POST':
+        fecha_daj = request.POST['Fecha_ingreso_DAJ']
+        respuesta_text = request.POST['respuesta']
+
+        try:
+            archivos_adjuntos_1 = request.FILES.getlist('archivo_adjunto')
+        except KeyError:
+            archivos_adjuntos_1 = None
+
+        try:
+            archivo_adjunto_2 = request.FILES.get('archivo_adjunto_2')
+        except KeyError:
+            archivo_adjunto_2 = None
+
+        try:
+            archivos_adjuntos_3 = request.FILES.getlist('archivo_adjunto_3')
+        except KeyError:
+            archivos_adjuntos_3 = None
+
+        pdf_comprimido_1 = procesar_archivos_adjuntos(archivos_adjuntos_1)
+        pdf_comprimido_3 = procesar_archivos_adjuntos(archivos_adjuntos_3)
+
+        # Crear la respuesta de la solicitud
+        Respuesta_solicitud.objects.create(
+            fecha_daj=fecha_daj,
+            id_solicitud=solicitud,
+            respuesta=respuesta_text,
+            archivo_adjunto=pdf_comprimido_1,
+            archivo_adjunto_2=archivo_adjunto_2,
+            archivo_adjunto_3=pdf_comprimido_3,
+            tipo=tipo_respuesta
+        )
+
+        # Actualizar el estado de la solicitud a "Amparo Respondido" si es tipo amparo, de lo contrario a "Respondida"
+        if tipo_respuesta == 'A':
+            solicitud.estado = "Amparo Respondido"
+        else:
+            solicitud.estado = "Respondida"
+        
+        solicitud.save()
+
+        return redirect('read')
+    
+    return render(request, 'crud_respuesta.html', data)
+
+
+@login_required
+def respuesta_edit(request, id=0):
+    Titulo = "EDICION"
+    respuesta = get_object_or_404(Respuesta_solicitud, id=id)
+
+    data = {
+        'Respuesta': respuesta,
+        'Titulo': Titulo
+    }
+
+    if request.method == 'POST':
+        fecha_daj = request.POST['Fecha_ingreso_DAJ']
+        respuesta_text = request.POST['respuesta']
+
+        try:
+            archivos_adjuntos_1 = request.FILES.getlist('archivo_adjunto')
+        except KeyError:
+            archivos_adjuntos_1 = None
+
+        try:
+            archivo_adjunto_2 = request.FILES.get('archivo_adjunto_2')
+        except KeyError:
+            archivo_adjunto_2 = None
+
+        try:
+            archivos_adjuntos_3 = request.FILES.getlist('archivo_adjunto_3')
+        except KeyError:
+            archivos_adjuntos_3 = None
+
+        # Combinar archivos nuevos con los antiguos
+        archivo_adjunto_combinado = combinar_archivos_adjuntos(archivos_adjuntos_1, respuesta.archivo_adjunto)
+        archivo_adjunto_3_combinado = combinar_archivos_adjuntos(archivos_adjuntos_3, respuesta.archivo_adjunto_3)
+
+        # Actualizar la respuesta de la solicitud
+        respuesta.fecha_daj = fecha_daj
+        respuesta.respuesta = respuesta_text
+        respuesta.archivo_adjunto = archivo_adjunto_combinado
+        respuesta.archivo_adjunto_2 = archivo_adjunto_2
+        respuesta.archivo_adjunto_3 = archivo_adjunto_3_combinado
+        respuesta.save()
+
+        return redirect('read')
+
+    return render(request, 'crud_respuesta.html', data)

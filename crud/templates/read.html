@@ -36,6 +36,20 @@ th {
         font-size: 13px; /* Puedes ajustar el tamaño de la fuente según tu preferencia */
         font-weight: bold; /* Opcional: hacer el texto en negrita */
     }
+
+/* Estilo para texto en fuente monoespaciada */
+.monospace {
+    font-family: "Space Mono", monospace;
+    white-space: pre; /* Mantener espacios y saltos de línea */
+    font-weight: normal; /* Peso de fuente normal para el contenido */
+    font-style: normal;
+}
+
+/* Estilo para los contenidos de las respuestas */
+.respuesta-content {
+    white-space: pre-wrap; /* Permitir saltos de línea automáticamente */
+    font-weight: normal;
+}
 </style>
 <section class="container">
     <br>
@@ -67,7 +81,7 @@ th {
                         <td>{{ Solicitud.fecha_i_au }}</td>
                         <td>{{ Solicitud.nombre_o_razon_social }} {{ Solicitud.primer_apellido }}</td>
                         <td>{{ Solicitud.N_transparencia }}</td>
-                        <td>{{ Solicitud.estado }}</td>
+                        <td>{{ Solicitud.estado }}  <br> {{ respuesta.fecha_daj }}</td>
             
                         <td class="td_buttons">
                             <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}">Ver Solicitud</a>                  
@@ -86,6 +100,15 @@ th {
                                     <!-- Botones para solicitudes de tipo normal -->
                                     {% if Solicitud.estado == 'Sin responder' %}
                                         <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple">Propuesta de respuesta</a>
+                                        {% if not Solicitud.prorroga_realizada %}
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                                Solicitar Prórroga
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                Prórroga Realizada
+                                            </button>
+                                        {% endif %}
                                     {% elif Solicitud.estado == 'Respondida' %}
                                         <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
                                         <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple">Editar Propuesta de Respuesta</a>
@@ -195,49 +218,109 @@ th {
                         <td>{{ Departamento.nombre_departamento }}</td>
                         {% endif %}
             
-                        <td class="td_dias_restantes"> <!-- Nueva columna para los días restantes (solo días hábiles) -->
+                        <td class="td_dias_restantes">
                             <script>
-                                function calcularDiasHabiles(fechaInicio, fechaFin) {
-                                    var fechaInicioMillis = new Date(fechaInicio).getTime();
-                                    var fechaFinMillis = new Date(fechaFin).getTime();
-                                    var diasHabiles = 0;
-                        
-                                    while (fechaInicioMillis <= fechaFinMillis) {
-                                        var diaSemana = new Date(fechaInicioMillis).getDay();
-                                        if (diaSemana !== 0 && diaSemana !== 6) {
-                                            diasHabiles++;
+                                // Función para calcular los días hábiles entre dos fechas
+                                function calculateBusinessDays(startDate, endDate) {
+                                    let count = 0;
+                                    let curDate = new Date(startDate.getTime());
+                            
+                                    while (curDate <= endDate) {
+                                        const dayOfWeek = curDate.getDay();
+                                        if (dayOfWeek !== 0 && dayOfWeek !== 6) { // No contar sábados y domingos
+                                            count++;
                                         }
-                                        fechaInicioMillis += 24 * 60 * 60 * 1000;
+                                        curDate.setDate(curDate.getDate() + 1);
                                     }
-                        
-                                    return diasHabiles;
+                            
+                                    return count;
                                 }
-                        
-                                var fechaLimite = '{{ Solicitud.fecha_limite }}';
-                                var diasHabilesRestantes = calcularDiasHabiles(new Date().toISOString().slice(0, 10), fechaLimite);
-                        
-                                // Asignar color según los días restantes
-                                var color;
-                                var background_color;
-                                if (diasHabilesRestantes <= 4) {
-                                    color = 'white'; // Rojo si quedan 5 días hábiles o menos
-                                    background_color = '#E73C45';
-                                } else if (diasHabilesRestantes <= 9) {
-                                    color = 'black'; // Amarillo si quedan entre 6 y 10 días hábiles
-                                    background_color = '#F7EA53';
-                                } else {
-                                    color = 'white'; // Verde si quedan más de 10 días hábiles
-                                    background_color = '#4BBFE0';
+                            
+                                // Función para convertir una fecha en formato "DD de MMMM de YYYY" a un objeto Date
+                                function parseDate(dateStr) {
+                                    const [day, month, year] = dateStr.split(' de ');
+                                    const months = {
+                                        'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+                                        'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+                                    };
+                                    return new Date(year, months[month.toLowerCase()], day);
                                 }
-                        
-                                // Mostrar el número de días con el color correspondiente y aplicar clase
-                                var diasRestantesElement = document.currentScript.parentElement;
-                                diasRestantesElement.style.backgroundColor = background_color;
-                                diasRestantesElement.style.color = color;
-                                diasRestantesElement.classList.add('dias-' + (diasHabilesRestantes <= 5 ? 'urgente' : (diasHabilesRestantes <= 10 ? 'alerta' : 'normal')));
-                                diasRestantesElement.innerHTML = diasHabilesRestantes;
+                            
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    // Obtener todas las filas del cuerpo de la tabla
+                                    const rows = document.querySelectorAll('#tabla_fichas tbody tr');
+                            
+                                    rows.forEach(row => {
+                                        // Obtener las celdas de fecha límite y estado/fecha DAJ
+                                        const fechaLimiteCell = row.querySelector('td:nth-child(10)');
+                                        const fechaITCell = row.querySelector('td:nth-child(2)');
+                                        const estadoFechaDAJCell = row.querySelector('td:nth-child(6)'); // Asumiendo que la columna de estado/fecha DAJ es la novena
+                            
+                                        if (fechaLimiteCell && fechaITCell && estadoFechaDAJCell) {
+                                            // Obtener las fechas y estado/fecha DAJ como cadenas de texto
+                                            const fechaLimiteStr = fechaLimiteCell.innerText.trim();
+                                            const fechaITStr = fechaITCell.innerText.trim();
+                                            const estadoFechaDAJStr = estadoFechaDAJCell.innerHTML.trim().split('<br>'); // Separar estado y fecha DAJ
+                            
+                                            const estado = estadoFechaDAJStr[0].trim();
+                                            const fechaDAJStr = estadoFechaDAJStr[1] ? estadoFechaDAJStr[1].trim() : null;
+                            
+                                            console.log('Fecha Ingreso:', fechaITStr);
+                                            console.log('Fecha Límite:', fechaLimiteStr);
+                                            console.log('Estado:', estado);
+                                            console.log('Fecha DAJ:', fechaDAJStr);
+                            
+                                            // Convertir las fechas de cadena de texto a objetos Date
+                                            const fechaLimite = parseDate(fechaLimiteStr);
+                                            const fechaIT = parseDate(fechaITStr);
+                                            const fechaDAJ = fechaDAJStr ? parseDate(fechaDAJStr) : null;
+                                            const fechaActual = new Date();
+                            
+                                            console.log('Fecha Ingreso Date:', fechaIT);
+                                            console.log('Fecha Límite Date:', fechaLimite);
+                                            console.log('Fecha DAJ Date:', fechaDAJ);
+                                            console.log('Fecha Actual:', fechaActual);
+                            
+                                            if (fechaLimite && fechaIT) {
+                                                // Calcular los días hábiles entre la fecha actual y la fecha límite
+                                                const diasRestantes = calculateBusinessDays(fechaActual, fechaLimite);
+                            
+                                                console.log('Días Restantes:', diasRestantes);
+                            
+                                                // Colocar el resultado en la celda correspondiente y cambiar el color de fondo
+                                                const diasRestantesCell = row.querySelector('.td_dias_restantes');
+                                                if (diasRestantesCell) {
+                                                    if (estado === 'Amparo Respondido' || estado === 'Respondida') {
+                                                        diasRestantesCell.innerHTML = '<span class="material-symbols-outlined" style="font-size: 35px !important;">task_alt</span>';
+                                                        diasRestantesCell.style.backgroundColor = '#19e67f';
+                                                        diasRestantesCell.style.color = '#ffffff'; // Contraste con el fondo azul
+                                                    } else {
+                                                        diasRestantesCell.innerText = diasRestantes;
+                            
+                                                        if (diasRestantes <= 3) {
+                                                            diasRestantesCell.style.backgroundColor = '#E73C45';
+                                                            diasRestantesCell.style.color = '#ffffff'; // Contraste con el fondo rojo
+                                                        } else if (diasRestantes <= 10) {
+                                                            diasRestantesCell.style.backgroundColor = '#F7EA53';
+                                                            diasRestantesCell.style.color = '#000000'; // Contraste con el fondo amarillo
+                                                        } else {
+                                                            diasRestantesCell.style.backgroundColor = '#4BBFE0';
+                                                            diasRestantesCell.style.color = '#ffffff'; // Contraste con el fondo azul
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                                });
                             </script>
+                            
+                            
+                            
+                            
+                            
                         </td>
+                        
                         
                     </tr>
                     {% empty %}
@@ -377,62 +460,66 @@ th {
             $respuesta[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     });
-</script>
-    
-      
-    
+</script> 
 
 
 <script>
-var previewLinks = document.querySelectorAll('.preview-link');
-previewLinks.forEach(function(link) {
-    link.addEventListener('click', function(event) {
-        event.preventDefault(); // Evitar el comportamiento predeterminado del enlace
+    document.addEventListener('DOMContentLoaded', function() {
+        var previewLinks = document.querySelectorAll('.preview-link');
 
-        var solicitudId = this.getAttribute('data-id'); // Obtener el ID de la solicitud
+        previewLinks.forEach(function(link) {
+            link.addEventListener('click', function(event) {
+                event.preventDefault(); // Evitar el comportamiento predeterminado del enlace
 
-        // Hacer una solicitud AJAX a la vista 0de Django para obtener los datos de la solicitud
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/accion/vista_previa_solicitud/' + solicitudId, true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var data = JSON.parse(xhr.responseText);
+                var solicitudId = this.getAttribute('data-id'); // Obtener el ID de la solicitud
 
-                // Construir el texto con los datos de la solicitud
-                var previewDataText = 'Fecha de la Solicitud: ' + data.fecha_i_t + '\n' +
-                                      'Fecha de la Asesoría Urbana: ' + data.fecha_i_au + '\n' +
-                                      'N° de Transparencia: ' + data.N_transparencia + '\n' +
-                                      'Dirigido a: ' + data.dirigido + '\n' +
-                                      'Región: ' + data.region + '\n' +
-                                      'Recepción: ' + data.recepcion + '\n' +
-                                      'Correo Electrónico: ' + data.email + '\n' +
-                                      'Texto de la Solicitud: ' + data.solicitud_text + '\n' +
-                                      'Observaciones: ' + data.observaciones + '\n' +
-                                      'Soporte: ' + data.soporte + '\n' +
-                                      'Formato: ' + data.formato + '\n' +
-                                      'Solicitante Inicia Sesión: ' + (data.solicitante_inicio_seccion ? 'Sí' : 'No') + '\n' +
-                                      'Forma de Recepción: ' + data.forma_de_recepccion + '\n' +
-                                      'Otra Forma de Entrega: ' + data.otra_forma_De_entrega + '\n' +
-                                      'Persona: ' + data.persona + '\n' +
-                                      'Nombre o Razón Social: ' + data.nombre_o_razon_social + '\n' +
-                                      'Primer Apellido: ' + data.primer_apellido + '\n' +
-                                      'Segundo Apellido: ' + data.segundo_apellido + '\n';
+                // Hacer una solicitud AJAX a la vista de Django para obtener los datos de la solicitud
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/accion/vista_previa_solicitud/' + solicitudId, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var data = JSON.parse(xhr.responseText);
 
-                var previewDataElement = document.getElementById('previewData');
-                previewDataElement.innerText = previewDataText;
+                        // Construir el texto con los datos de la solicitud
+                        var previewDataText = '<strong>N° de Folio:</strong>                         ' + data.N_transparencia + '\n' +
+                                              '<strong>Ingreso a Asesoria Urbana:</strong>           ' + data.fecha_i_au + '\n' +
+                                              '<strong>Ingreso a Portal de Transparencia:</strong>   ' + data.fecha_i_t + '\n' +
+                                              '<strong>Dirigido a:</strong>                          ' + data.dirigido + '\n' +
+                                              '<strong>Región:</strong>                              ' + data.region + '\n' +
+                                              '<strong>Recepción:</strong>                           ' + data.recepcion + '\n' +
+                                              '<strong>Correo Electrónico:</strong>                  ' + data.email + '\n' +
+                                              '<strong>Texto de la Solicitud:</strong>               \n' + data.solicitud_text + '\n' +
+                                              '<strong>Observaciones:</strong>                       ' + data.observaciones + '\n' +
+                                              '<strong>Soporte:</strong>                             ' + data.soporte + '\n' +
+                                              '<strong>Formato:</strong>                             ' + data.formato + '\n' +
+                                              '<strong>Solicitante Inicia Sesión:</strong>           ' + (data.solicitante_inicio_seccion ? 'Sí' : 'No') + '\n' +
+                                              '<strong>Forma de Recepción:</strong>                  ' + data.forma_de_recepccion + '\n' +
+                                              '<strong>Otra Forma de Entrega:</strong>               ' + data.otra_forma_De_entrega + '\n' +
+                                              '<strong>Persona:</strong>                             ' + data.persona + '\n' +
+                                              '<strong>Nombre o Razón Social:</strong>               ' + data.nombre_o_razon_social + '\n' +
+                                              '<strong>Primer Apellido:</strong>                     ' + data.primer_apellido + '\n' +
+                                              '<strong>Segundo Apellido:</strong>                    ' + data.segundo_apellido + '\n';
 
-                // Si hay un archivo adjunto, agregar enlace de descarga
-                if (data.archivo_adjunto_url) {
-                    previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Adjunto</a>';
-                }
+                        var previewDataElement = document.getElementById('previewData');
+                        previewDataElement.innerHTML = '<div class="monospace">' + previewDataText + '</div>';
 
-                $('#previewModal').modal('show'); // Mostrar el modal utilizando jQuery
-            }
-        };
-        xhr.send();
+                        // Si hay un archivo adjunto, agregar enlace de descarga
+                        if (data.archivo_adjunto_url) {
+                            previewDataElement.innerHTML += '<br><a href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Adjunto</a>';
+                        }
+
+                        $('#previewModal').modal('show'); // Mostrar el modal utilizando jQuery
+                    }
+                };
+                xhr.send();
+            });
+        });
     });
-});
 </script>
+
+
+
+
 
 <script>
     function addPreviewEventListener(selector, tipo) {
@@ -440,9 +527,9 @@ previewLinks.forEach(function(link) {
         previewLinks.forEach(function(link) {
             link.addEventListener('click', function(event) {
                 event.preventDefault(); // Evitar el comportamiento predeterminado del enlace
-        
+
                 var solicitudId = this.getAttribute('data-id'); // Obtener el ID de la solicitud
-        
+
                 // Hacer una solicitud AJAX a la vista de Django para obtener los datos de la solicitud
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', '/accion/vista_previa_respuesta/' + solicitudId + '?tipo=' + tipo, true);
@@ -450,11 +537,13 @@ previewLinks.forEach(function(link) {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var data = JSON.parse(xhr.responseText);
 
+                        // Construir el texto con los datos de la respuesta
                         var previewDataText = '';
-                        if (data.respuestas) {
+                        if (data.respuestas && data.respuestas.length > 0) {
                             data.respuestas.forEach(function(respuesta, index) {
-                                previewDataText += 'Respuesta ' + (index + 1) + ': ' + respuesta.respuesta + '<br>' +
-                                                   'Fecha DAJ: ' + respuesta.fecha_daj + '<br>';
+                                previewDataText += '<strong>Fecha de Respuesta DAJ:</strong> ' + respuesta.fecha_daj + '<br>' +
+                                                   '<strong>Respuesta ' + (index + 1) + ':</strong><br>' +
+                                                   '<div class="respuesta-content">' + respuesta.respuesta + '</div><br>';
 
                                 // Si hay un archivo adjunto, agregar enlace de descarga
                                 if (respuesta.archivo_adjunto_url) {
@@ -466,16 +555,21 @@ previewLinks.forEach(function(link) {
                                 if (respuesta.archivo_adjunto_url_3) {
                                     previewDataText += '<a href="' + respuesta.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos, PDF, etc)</a><br>';
                                 }
-                                                                
-                                if (data.departamento && data.departamento === 'ADMIN') {
+                                
+                                // Verificar si el tipo es 'A' y el usuario es ADMIN para mostrar el botón de edición
+                                if (tipo === 'A' && data.departamento && data.departamento === 'ADMIN') {
                                     previewDataText += '<a href="respuesta_edit/' + respuesta.id + '" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
                                 }
 
                                 previewDataText += '<hr>';
                             });
+                        } else if (tipo === 'A') {
+                            // Si no hay respuestas de tipo 'A' (Amparo), mostrar mensaje
+                            previewDataText = 'No hay Amparos Disponibles';
                         } else if (data.respuesta) {
-                            previewDataText = 'Fecha DAJ: ' + data.fecha_daj + '<br>' +
-                                              'Respuesta: ' + data.respuesta + '<br>';
+                            previewDataText = '<strong>Fecha de Respuesta DAJ:</strong> ' + data.fecha_daj + '<br>' +
+                                              '<strong>Respuesta:</strong><br>' +
+                                              '<div class="respuesta-content">' + data.respuesta + '</div><br>';
 
                             // Si hay un archivo adjunto, agregar enlace de descarga
                             if (data.archivo_adjunto_url) {
@@ -488,15 +582,15 @@ previewLinks.forEach(function(link) {
                                 previewDataText += '<a href="' + data.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos, PDF, etc)</a><br>';
                             }
 
-                            // Verificar si el usuario es ADMIN para mostrar el botón de edición
-                            if (data.departamento && data.departamento === 'ADMIN') {
+                            // Verificar si el tipo es 'A' y el usuario es ADMIN para mostrar el botón de edición
+                            if (tipo === 'A' && data.departamento && data.departamento === 'ADMIN') {
                                 previewDataText += '<a href="respuesta_edit/' + data.respuesta.id + '" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
                             }
                         }
-    
+
                         var previewDataElement = document.getElementById('previewData');
-                        previewDataElement.innerHTML = previewDataText;
-        
+                        previewDataElement.innerHTML = '<div class="monospace">' + previewDataText + '</div>';
+
                         $('#previewModal').modal('show'); // Mostrar el modal utilizando jQuery
                     }
                 };
@@ -509,8 +603,5 @@ previewLinks.forEach(function(link) {
     addPreviewEventListener('.preview-res-amparo-link', 'A');
     addPreviewEventListener('.preview-res-respuesta-link', 'R');
 </script>
-
-
-
 
 {% endblock custom_js %}

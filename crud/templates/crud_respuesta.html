@@ -104,9 +104,7 @@
                 <div class="col-12">
                     <div class="form-group">
                         <label class="form-label" for="archivo_adjunto"><b>Archivos adjuntos</b></label>
-                        <br>
-                        <br>
-            
+                        <br><br>
                         <label for="archivo_adjunto" class="custom-file-upload">
                             <input type="file" id="archivo_adjunto" name="archivo_adjunto" accept=".pdf" multiple onchange="mostrarNombreArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1', 'eliminar_archivo_1')">
                             1. Folio (consulta desde consejo transparencia)
@@ -120,7 +118,7 @@
                         <br><br>
                         
                         <label for="archivo_adjunto_2" class="custom-file-upload">
-                            <input type="file" id="archivo_adjunto_2" name="archivo_adjunto_2" onchange="mostrarNombreArchivo('archivo_adjunto_2', 'nombre_archivo_seleccionado_2', 'eliminar_archivo_2')">
+                            <input type="file" id="archivo_adjunto_2" name="archivo_adjunto_2" accept=".docx" onchange="mostrarNombreArchivo('archivo_adjunto_2', 'nombre_archivo_seleccionado_2', 'eliminar_archivo_2')">
                             2. Propuesta de respuesta (Respaldo)
                         </label>
                         <span id="nombre_archivo_seleccionado_2">
@@ -142,11 +140,10 @@
                         </span>
                         <button type="button" id="eliminar_archivo_3" style="display: none;" onclick="eliminarArchivo('archivo_adjunto_3', 'nombre_archivo_seleccionado_3', 'eliminar_archivo_3')">Eliminar</button>
                         <br><br>
-                        
-
                     </div>
                 </div>
             </div>
+            
             
             
             

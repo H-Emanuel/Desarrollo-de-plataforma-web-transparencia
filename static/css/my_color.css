@@ -1,92 +1,121 @@
 .btn {
-    display: inline-block;
-    padding: 10px 5px;
-    border: none;
-    border-radius: 5px;
-    font-size: 15px;
-    color: #fff;
-    text-decoration: none;
-    transition: background-color 0.2s;
-    width: 220px; /* Asegúrate de que el ancho sea apropiado para el contenedor */
-    margin-top: 2.5px;
-    margin-bottom: 2.5px;
-    margin-left: 5px;
-    
+  display: inline-block;
+  padding: 10px 5px;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  width: 220px; /* Asegúrate de que el ancho sea apropiado para el contenedor */
+  margin-top: 2.5px;
+  margin-bottom: 2.5px;
+  margin-left: 5px;
 }
 
-
 tbody .td_dias_restantes {
-    padding: 5px; /* Ajusta según necesites */
-    font-size: x-large;
-    font-weight: bold;
-    text-align: center; /* Centra horizontalmente */
-    vertical-align: middle; /* Centra verticalmente */
-
+  padding: 5px; /* Ajusta según necesites */
+  font-size: x-large;
+  font-weight: bold;
+  text-align: center; /* Centra horizontalmente */
+  vertical-align: middle; /* Centra verticalmente */
 }
 
 @font-face {
-    font-family: 'HelveticaNeueRoman';
-    src: url('fonts/HelveticaNeueRoman.otf') format('opentype');
-    /* Puedes añadir más formatos como woff, woff2, ttf si es necesario */
+  font-family: "HelveticaNeueRoman";
+  src: url("fonts/HelveticaNeueRoman.otf") format("opentype");
+  /* Puedes añadir más formatos como woff, woff2, ttf si es necesario */
+}
+
+.space-mono-regular {
+  font-family: "Space Mono", monospace;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.space-mono-bold {
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.space-mono-regular-italic {
+  font-family: "Space Mono", monospace;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.space-mono-bold-italic {
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-style: italic;
 }
 
 body {
-    font-family: 'HelveticaNeueRoman', sans-serif;
+  font-family: "HelveticaNeueRoman", sans-serif;
 }
 
 h1 {
-    font-family: 'Trebuchet MS', sans-serif;
+  font-family: "Trebuchet MS", sans-serif;
 }
 
 .modal-body {
-    text-align: justify;    
+  text-align: justify;
 }
 /* Estilos según el estado de los días restantes */
 tbody .td_dias_restantes.dias-urgente {
-    color: white;
+  color: white;
 }
 
 tbody .td_dias_restantes.dias-alerta {
-    color: black;
+  color: black;
 }
 
 tbody .td_dias_restantes.dias-normal {
-    color: white;
+  color: white;
 }
 
-table.dataTable.table-striped>tbody>tr.odd>td.td_dias_restantes  {
-    box-shadow: none;
+table.dataTable.table-striped > tbody > tr.odd > td.td_dias_restantes {
+  box-shadow: none;
 }
 
 /* Estilos específicos para el botón púrpura */
 .btn-purple {
-    background-color: #717171; /* Púrpura */
+  background-color: #717171; /* Púrpura */
 }
 
 /* Cambio de color al pasar el mouse */
 .btn:hover {
-    background-color: #414141; /* Púrpura más claro */
+  background-color: #414141; /* Púrpura más claro */
 }
 
-
 .row {
-    width: 100%;
+  width: 100%;
 }
 
 #tabla_fichas_wrapper {
-    width: 100%;
-
+  width: 100%;
 }
 
+.modal.show .modal-dialog {
+    min-width: min-content; /* Use min-content by default */
+    max-width: 85ch;        /* Set a maximum width of 85ch */
+  }
+  
 
 @media (min-width: 1600px) {
-    .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
-        max-width: 1500px;
-    }
+  .container,
+  .container-lg,
+  .container-md,
+  .container-sm,
+  .container-xl,
+  .container-xxl {
+    max-width: 1500px;
+  }
 }
 
 @media (min-width: 1366px) {
-    .modal-dialog {
-        min-width: 800px;        
-    }
+  .modal-dialog {
+    min-width: 800px;
+  }
 }
