@@ -238,12 +238,29 @@ th {
                             
                                 // Función para convertir una fecha en formato "DD de MMMM de YYYY" a un objeto Date
                                 function parseDate(dateStr) {
+                                    if (!dateStr || typeof dateStr !== 'string') {
+                                        console.error('Invalid date string:', dateStr);
+                                        return null;
+                                    }
+                                    
                                     const [day, month, year] = dateStr.split(' de ');
+                                    if (!day || !month || !year) {
+                                        console.error('Date string not in expected format:', dateStr);
+                                        return null;
+                                    }
+                            
                                     const months = {
                                         'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
                                         'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
                                     };
-                                    return new Date(year, months[month.toLowerCase()], day);
+                            
+                                    const monthIndex = months[month.toLowerCase()];
+                                    if (monthIndex === undefined) {
+                                        console.error('Invalid month in date string:', month);
+                                        return null;
+                                    }
+                            
+                                    return new Date(year, monthIndex, day);
                                 }
                             
                                 document.addEventListener('DOMContentLoaded', function() {
@@ -314,6 +331,7 @@ th {
                                     });
                                 });
                             </script>
+                            
                             
                             
                             
