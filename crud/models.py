@@ -109,6 +109,9 @@ class Respuesta_solicitud(models.Model):
         verbose_name = "Respuesta"
         verbose_name_plural = "Respuestas"
 
+
+        
+# CAMBIAR TABLA DEPARTAMENTO SOLO CON nombre_departamento Y ID
 class Departamento(models.Model): 
     id_usuario = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True )
     nombre_departamento = models.CharField(max_length=150, blank=True, default='',choices=DEPARTAMENTO_CHOICES)
@@ -116,3 +119,5 @@ class Departamento(models.Model):
     class Meta:
         verbose_name = "Departamento"
         verbose_name_plural = "Departamento"
+
+# CREAR TABLA DEPARTAMENTO_USUARIO SOLO TIENE QUE IR ID_DEPARTAMENT Y ID_USUARIO

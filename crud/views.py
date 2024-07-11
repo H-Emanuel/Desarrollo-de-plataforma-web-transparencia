@@ -17,6 +17,7 @@ import io
 @login_required(login_url='/login/')
 def home(request):
     user = request.user
+    #CAMBIAR LA TIPO DE BUSQUEDAD 
     departamento_usuario = Departamento.objects.filter(id_usuario=user).first()
 
     OPTIONS = {
@@ -56,6 +57,8 @@ def home(request):
         # Calcular la fecha límite según el tipo de solicitud
         fecha_limite = calcular_fecha_limite(fecha_ingreso_t, N_transparencia[0])
 
+
+        # ESTE SE TIENE QUE CAMBIAR -----------
         if departamento_usuario.nombre_departamento == "ADMIN":
             Departamento_admin = request.POST['departamento_admin']
         else:
@@ -95,6 +98,9 @@ def home(request):
 
 def read(request):
     user = request.user
+
+    # CABMIAR_ESE CODIGO MAS IMPORTANTE 
+
     departamento_usuario = Departamento.objects.filter(id_usuario=user).first()
 
     if departamento_usuario and departamento_usuario.nombre_departamento == 'ADMIN':
@@ -212,6 +218,7 @@ def vista_previa_respuesta(request, id):
     user = request.user
     
     # Obtener el departamento del usuario actual
+    # CAMIAR ESTE CODIGO DE DEPARTAMENTO
     try:
         departamento_usuario = Departamento.objects.get(id_usuario=user)
         nombre_departamento = departamento_usuario.nombre_departamento
