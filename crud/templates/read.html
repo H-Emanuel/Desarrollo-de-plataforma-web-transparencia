@@ -77,8 +77,8 @@ th {
                     {% for Solicitud, respuesta, Departamento in solicitud_respuesta_list %}
                     <tr>
                         <td>{{ Solicitud.id }}</td>
-                        <td>{{ Solicitud.fecha_i_t }}</td>
-                        <td>{{ Solicitud.fecha_i_au }}</td>
+                        <td>{{ Solicitud.fecha_i_t|date:"M. d, Y" }}</td>
+                        <td>{{ Solicitud.fecha_i_au|date:"M. d, Y" }}</td>
                         <td>{{ Solicitud.nombre_o_razon_social }} {{ Solicitud.primer_apellido }}</td>
                         <td>{{ Solicitud.N_transparencia }}</td>
                         <td>{{ Solicitud.estado }}  <br> {{ respuesta.fecha_daj }}</td>
@@ -211,7 +211,7 @@ th {
             
                         <td class="invisible">{{ Solicitud.solicitud_text }}</td>
                         <td class="respuesta">{{ respuesta.respuesta }}</td>
-                        <td>{{ Solicitud.fecha_limite }}</td>
+                        <td>{{ Solicitud.fecha_limite|date:"M. d, Y" }}</td>
                         {% if departamento.nombre_departamento == 'ADMIN' %}
                         <td>{{ Solicitud.Departamento_admin }}</td>
                         {% else %}
@@ -236,31 +236,48 @@ th {
                                     return count;
                                 }
                             
-                                // Función para convertir una fecha en formato "DD de MMMM de YYYY" a un objeto Date
+                                // Función para convertir una fecha en formato "MMM. d, Y" o "DD de MMMM de YYYY" a un objeto Date
                                 function parseDate(dateStr) {
                                     if (!dateStr || typeof dateStr !== 'string') {
                                         console.error('Invalid date string:', dateStr);
                                         return null;
                                     }
-                                    
-                                    const [day, month, year] = dateStr.split(' de ');
-                                    if (!day || !month || !year) {
-                                        console.error('Date string not in expected format:', dateStr);
-                                        return null;
+                            
+                                    // Intentar parsear formato "MMM. d, Y"
+                                    let dateParts = dateStr.split(', ');
+                                    if (dateParts.length === 2) {
+                                        const [monthDay, year] = dateParts;
+                                        const [monthStr, day] = monthDay.split(' ');
+                            
+                                        const months = {
+                                            'Jan.': 0, 'Feb.': 1, 'Mar.': 2, 'Apr.': 3, 'May': 4, 'Jun.': 5,
+                                            'Jul.': 6, 'Aug.': 7, 'Sep.': 8, 'Oct.': 9, 'Nov.': 10, 'Dec.': 11
+                                        };
+                            
+                                        const monthIndex = months[monthStr];
+                                        if (monthIndex !== undefined) {
+                                            return new Date(year, monthIndex, day);
+                                        }
                                     }
                             
-                                    const months = {
-                                        'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
-                                        'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
-                                    };
+                                    // Intentar parsear formato "DD de MMMM de YYYY"
+                                    dateParts = dateStr.split(' de ');
+                                    if (dateParts.length === 3) {
+                                        const [day, month, year] = dateParts;
                             
-                                    const monthIndex = months[month.toLowerCase()];
-                                    if (monthIndex === undefined) {
-                                        console.error('Invalid month in date string:', month);
-                                        return null;
+                                        const months = {
+                                            'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+                                            'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+                                        };
+                            
+                                        const monthIndex = months[month.toLowerCase()];
+                                        if (monthIndex !== undefined) {
+                                            return new Date(year, monthIndex, day);
+                                        }
                                     }
                             
-                                    return new Date(year, monthIndex, day);
+                                    console.error('La fecha no tiene el formato esperado:', dateStr);
+                                    return null;
                                 }
                             
                                 document.addEventListener('DOMContentLoaded', function() {
@@ -331,6 +348,8 @@ th {
                                     });
                                 });
                             </script>
+                            
+                            
                             
                             
                             
