@@ -22,9 +22,34 @@ tbody .td_dias_restantes {
 }
 
 @font-face {
-  font-family: "HelveticaNeueRoman";
-  src: url("fonts/HelveticaNeueRoman.otf") format("opentype");
-  /* Puedes añadir más formatos como woff, woff2, ttf si es necesario */
+  font-family: "HelveticaNeue";
+  src: url("/static/fonts/HelveticaNeueBold.otf") format("opentype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Helvetica Neue Roman */
+@font-face {
+  font-family: "HelveticaNeue";
+  src: url("/static/fonts/HelveticaNeueRoman.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Helvetica Neue Bold Italic */
+@font-face {
+  font-family: "HelveticaNeue";
+  src: url("/static/fonts/HelveticaNeueBoldItalic.otf") format("opentype");
+  font-weight: bold;
+  font-style: italic;
+}
+
+/* Helvetica Neue Italic */
+@font-face {
+  font-family: "HelveticaNeue";
+  src: url("/static/fonts/HelveticaNeueItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
 }
 
 .space-mono-regular {
@@ -99,8 +124,22 @@ table.dataTable.table-striped > tbody > tr.odd > td.td_dias_restantes {
 
 .modal.show .modal-dialog {
     min-width: min-content; /* Use min-content by default */
-    max-width: 85ch;        /* Set a maximum width of 85ch */
+    max-width: 100ch;        /* Set a maximum width of 85ch */
   }
+
+/* Estilo para texto en fuente monoespaciada */
+.monospace {
+  font-family: "Space Mono", monospace;
+  font-family: monospace;
+  white-space: pre-wrap; /* Preserve espacios y saltos de línea */
+  word-wrap: break-word; /* Rompe palabras largas */
+}
+
+/* Estilo para los contenidos de las respuestas */
+.respuesta-content {
+  white-space: pre-wrap; /* Permitir saltos de línea automáticamente */
+  font-weight: normal;
+}
   
 
 @media (min-width: 1600px) {
