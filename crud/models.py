@@ -85,9 +85,25 @@ class Solicitud(models.Model):
 
 def content_file_name_respuesta(instance, filename):
     ext = filename.split('.')[-1]
-    filename = "%s.%s" % ('p', ext)
-    folder = "assets_respuesta/" + str(instance.id_solicitud.id)
-    return os.path.join(folder, filename)
+    tipo_archivo = ''
+    tipo_respuesta = 'Normal'  # Asume que es una respuesta normal por defecto
+    if instance.archivo_adjunto == filename:
+        tipo_archivo = 'Folio_n_folio'
+    elif instance.archivo_adjunto_2 == filename:
+        tipo_archivo = 'Propuesta_Respuesta_n_folio'
+    elif instance.archivo_adjunto_3 == filename:
+        tipo_archivo = 'Adjunto_n_folio'
+
+     # Verifica si la solicitud es de tipo 'C' (Amparo)
+    if instance.id_solicitud.N_transparencia[0] == 'C':
+        tipo_respuesta = 'Amparo'
+
+
+    n_folio = instance.id_solicitud.N_transparencia
+    nuevo_nombre = f"{tipo_archivo}_{tipo_respuesta}_{n_folio}.{ext}"
+    folder = f"assets_respuesta/{instance.id_solicitud.id}"
+    return os.path.join(folder, nuevo_nombre)
+
 
 
 class Respuesta_solicitud(models.Model): 

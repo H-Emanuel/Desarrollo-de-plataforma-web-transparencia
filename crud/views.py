@@ -1,3 +1,4 @@
+from http.client import HTTPResponse
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -139,21 +140,62 @@ def read(request):
 
 
 def calcular_fecha_limite(fecha_ingreso, tipo_solicitud):
-    # Contador para llevar la cuenta de los días hábiles
+    # Verificar el tipo de fecha y convertir si es necesario
+    if isinstance(fecha_ingreso, str):
+        fecha_ingreso = datetime.strptime(fecha_ingreso, '%Y-%m-%d').date()
+    
     dias_habiles = 0
-    fecha_actual = fecha_ingreso  # Comenzar desde la fecha de ingreso
+    fecha_actual = fecha_ingreso
+    dias_limite = 20 if tipo_solicitud != 'C' else 10
 
-    # Determinar el número de días hábiles según el tipo de solicitud
-    dias_limite = 13 if tipo_solicitud != 'C' else 10
-
-    # Bucle para encontrar la fecha límite
     while dias_habiles < dias_limite:
-        # Si es sábado o domingo, no se cuentan como días hábiles
-        if fecha_actual.weekday() not in [5, 6]:
+        if fecha_actual.weekday() not in [5, 6]:  # Excluir sábados y domingos
             dias_habiles += 1
         fecha_actual += timedelta(days=1)
 
-    return fecha_actual - timedelta(days=1)  # Restar un día para incluir la fecha de ingreso
+    return fecha_actual - timedelta(days=1)
+
+
+
+@login_required
+def editar_solicitud(request, solicitud_id):
+    solicitud = get_object_or_404(Solicitud, pk=solicitud_id)
+    user = request.user
+    today = datetime.today().strftime('%Y-%m-%d')
+    # Consultar el departamento del usuario
+    try:
+        departamento = Departamento.objects.get(id_usuario_id=user.id)
+        es_admin = departamento.nombre_departamento == 'ADMIN'
+    except Departamento.DoesNotExist:
+        es_admin = False
+
+    if request.method == 'POST':
+        solicitud.N_transparencia = request.POST['N_transparencia']
+        solicitud.solicitud_text = request.POST['solicitud_text']
+
+        # Verificar si el usuario tiene permiso para editar las fechas
+        if es_admin:
+            solicitud.fecha_i_t = request.POST['fecha_i_t']
+            solicitud.fecha_i_au = request.POST['fecha_i_au']
+
+        # Si hay un nuevo archivo adjunto, actualizarlo
+        if 'archivo_adjunto' in request.FILES:
+            solicitud.archivo_adjunto = request.FILES['archivo_adjunto']
+
+        # Recalcular y guardar la fecha límite
+        fecha_limite = calcular_fecha_limite(solicitud.fecha_i_t, solicitud.N_transparencia[0])
+        solicitud.fecha_limite = fecha_limite
+
+        solicitud.save()
+        return redirect('home')  # Redirige a la página deseada tras guardar
+
+    context = {
+        'solicitud': solicitud,
+        'es_admin': es_admin,
+        'today': today,
+    }
+    return render(request, 'editar_solicitud.html', context)
+
 
 def calcular_prorroga(fecha_limite, dias_prorroga):
     dias_habiles = 0
@@ -332,14 +374,20 @@ def combinar_archivos_adjuntos(archivos_nuevos, archivo_viejo):
 def respuesta(request, id=0):
     solicitud = get_object_or_404(Solicitud, id=id)
     Titulo = "CREACIÓN"
+    TEST = ""
 
-    # Obtener el tipo de respuesta desde los parámetros de la URL o establecer un valor por defecto
     tipo_respuesta = request.GET.get('tipo', 'R')
+
+    if tipo_respuesta == "R":
+        TEST = "RESPUESTA"
+    elif tipo_respuesta == "A":
+        TEST = "AMPARO"
 
     data = {
         'solicitud': solicitud,
         'Titulo': Titulo,
-        'tipo': tipo_respuesta  # Pasamos el tipo de respuesta al contexto
+        'tipo': tipo_respuesta,  # Pasamos el tipo de respuesta al contexto
+        'TEST': TEST
     }
 
     if request.method == 'POST':
@@ -364,7 +412,6 @@ def respuesta(request, id=0):
         pdf_comprimido_1 = procesar_archivos_adjuntos(archivos_adjuntos_1)
         pdf_comprimido_3 = procesar_archivos_adjuntos(archivos_adjuntos_3)
 
-        # Crear la respuesta de la solicitud
         Respuesta_solicitud.objects.create(
             fecha_daj=fecha_daj,
             id_solicitud=solicitud,
@@ -375,28 +422,49 @@ def respuesta(request, id=0):
             tipo=tipo_respuesta
         )
 
-        # Actualizar el estado de la solicitud a "Amparo Respondido" si es tipo amparo, de lo contrario a "Respondida"
         if tipo_respuesta == 'A':
-            solicitud.estado = "Amparo Respondido"
+            if solicitud.estado == 'Respondida':
+                solicitud.estado = 'Respondida con Amparo Incluido'
+            else:
+                solicitud.estado = 'Amparo Respondido'
         else:
-            solicitud.estado = "Respondida"
-        
+            if solicitud.estado == 'Amparo Respondido':
+                solicitud.estado = 'Respondida con Amparo Incluido'
+            else:
+                solicitud.estado = 'Respondida'
+
         solicitud.save()
 
         return redirect('read')
-    
+
     return render(request, 'crud_respuesta.html', data)
 
 
 @login_required
 def respuesta_edit(request, id=0):
-    Titulo = "EDICION"
     respuesta = get_object_or_404(Respuesta_solicitud, id=id)
+    Titulo = "EDICION"
+    TEST = ""
+
+
+    # Obtener el tipo de respuesta desde los parámetros de la URL o establecer un valor por defecto
+    tipo_respuesta = request.GET.get('tipo', 'R')
+    
+    if tipo_respuesta == "R":
+        TEST = "RESPUESTA"
+    elif tipo_respuesta == "A":
+        TEST = "AMPARO"
+
+    
 
     data = {
         'Respuesta': respuesta,
-        'Titulo': Titulo
+        'Titulo': Titulo,
+        'tipo': tipo_respuesta,
+        'TEST': TEST
+
     }
+    
 
     if request.method == 'POST':
         fecha_daj = request.POST['Fecha_ingreso_DAJ']

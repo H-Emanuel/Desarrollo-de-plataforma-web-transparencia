@@ -82,7 +82,10 @@ th {
                                         <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
                                     {% elif Solicitud.estado == 'Amparo Respondido' %}
                                         <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
-                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" style="font-size: 11.73px;" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a>
+                                    {% elif Solicitud.estado == 'Respondida con Amparo Incluido' %}
+                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" style="font-size: 11.73px;" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a>
                                     {% endif %}
                                 {% else %}
                                     <!-- Botones para solicitudes de tipo normal -->
@@ -99,9 +102,10 @@ th {
                                         {% endif %}
                                     {% elif Solicitud.estado == 'Respondida' %}
                                         <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
-                                        <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple">Editar Propuesta de Respuesta</a>
-                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
-                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                        <a href="{% url 'respuesta_edit' respuesta.id %}?tipo=R" class="btn btn-primary">Editar Propuesta de Respuesta</a>
+
+                                        {% comment %} <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a> {% endcomment %}
+                                        {% comment %} <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a> {% endcomment %}
                                         {% if not Solicitud.prorroga_realizada %}
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
                                                 Solicitar Prórroga
@@ -113,9 +117,20 @@ th {
                                         {% endif %}
                                     {% elif Solicitud.estado == 'Amparo Respondido' %}
                                         <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
-                                        <a href="{% url 'respuesta_edit' respuesta.id %}" class="btn btn-purple">Editar Propuesta de Respuesta</a>
                                         <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
-                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" style="font-size: 11.73px;" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a>
+                                        {% if not Solicitud.prorroga_realizada %}
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                                Solicitar Prórroga
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                Prórroga Realizada
+                                            </button>
+                                        {% endif %}
+                                    {% elif Solicitud.estado == 'Respondida con Amparo Incluido' %}
+                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" style="font-size: 11.73px;" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a>
                                         {% if not Solicitud.prorroga_realizada %}
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
                                                 Solicitar Prórroga
@@ -135,16 +150,29 @@ th {
                                         <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
                                     {% elif Solicitud.estado == 'Amparo Respondido' %}
                                         <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
-                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" style="font-size: 11.73px;" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a>
+                                    {% elif Solicitud.estado == 'Respondida con Amparo Incluido' %}
+                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" style="font-size: 11.73px;" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a>
                                     {% endif %}
                                 {% else %}
                                     <!-- Botones para solicitudes de tipo normal -->
                                     {% if Solicitud.estado == 'Sin responder' %}
                                         <a href="{% url 'respuesta' Solicitud.id %}" class="btn btn-purple">Propuesta de respuesta</a>
+                                        {% if not Solicitud.prorroga_realizada %}
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                                Solicitar Prórroga
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                Prórroga Realizada
+                                            </button>
+                                        {% endif %}
                                     {% elif Solicitud.estado == 'Respondida' %}
-                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
-                                        <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
-                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>            
+
+                                        {% comment %} <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a> {% endcomment %}
+                                        {% comment %} <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a> {% endcomment %}
                                         {% if not Solicitud.prorroga_realizada %}
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
                                                 Solicitar Prórroga
@@ -157,7 +185,19 @@ th {
                                     {% elif Solicitud.estado == 'Amparo Respondido' %}
                                         <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
                                         <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a>
-                                        <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta Amparo</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" style="font-size: 11.73px;" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a>
+                                        {% if not Solicitud.prorroga_realizada %}
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
+                                                Solicitar Prórroga
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                Prórroga Realizada
+                                            </button>
+                                        {% endif %}
+                                    {% elif Solicitud.estado == 'Respondida con Amparo Incluido' %}
+                                        <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
+                                        <a href="#" class="btn btn-purple preview-res-amparo-link" style="font-size: 11.73px;" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a>
                                         {% if not Solicitud.prorroga_realizada %}
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#prorrogaModal-{{ Solicitud.id }}">
                                                 Solicitar Prórroga
@@ -170,6 +210,7 @@ th {
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
+
                         
                             <!-- Modal para ingresar la cantidad de días de prórroga -->
                             <div class="modal fade" id="prorrogaModal-{{ Solicitud.id }}" tabindex="-1" aria-labelledby="prorrogaModalLabel-{{ Solicitud.id }}" aria-hidden="true">
@@ -208,94 +249,98 @@ th {
             
                         <td class="td_dias_restantes">
                             <script>
-                                // Función para calcular los días hábiles entre dos fechas
+                                // Función para calcular los días hábiles entre dos fechas, incluyendo el primer día
                                 function calculateBusinessDays(startDate, endDate) {
                                     let count = 0;
                                     let curDate = new Date(startDate.getTime());
-                            
-                                    while (curDate <= endDate) {
+                        
+                                    // Si la fecha de inicio es el mismo día que la fecha actual, inclúyela en el conteo
+                                    if (startDate.toDateString() === curDate.toDateString()) {
+                                        count++;
+                                    }
+                        
+                                    while (curDate < endDate) {
                                         const dayOfWeek = curDate.getDay();
                                         if (dayOfWeek !== 0 && dayOfWeek !== 6) { // No contar sábados y domingos
                                             count++;
                                         }
                                         curDate.setDate(curDate.getDate() + 1);
                                     }
-                            
+                        
                                     return count;
                                 }
-                            
+                        
                                 // Función para convertir una fecha en formato "MMM. d, Y" o "DD de MMMM de YYYY" a un objeto Date
                                 function parseDate(dateStr) {
                                     if (!dateStr || typeof dateStr !== 'string') {
                                         console.error('Invalid date string:', dateStr);
                                         return null;
                                     }
-                            
+                        
                                     // Intentar parsear formato "MMM. d, Y"
                                     let dateParts = dateStr.split(', ');
                                     if (dateParts.length === 2) {
                                         const [monthDay, year] = dateParts;
                                         const [monthStr, day] = monthDay.split(' ');
-                            
+                        
                                         const months = {
                                             'Ene.': 0, 'Feb.': 1, 'Mar.': 2, 'Abr.': 3, 'May.': 4, 'Jun.': 5,
                                             'Jul.': 6, 'Ago.': 7, 'Sep.': 8, 'Oct.': 9, 'Nov.': 10, 'Dic.': 11
                                         };
-                            
+                        
                                         const monthIndex = months[monthStr];
                                         if (monthIndex !== undefined) {
                                             return new Date(year, monthIndex, day);
                                         }
                                     }
-                            
+                        
                                     // Intentar parsear formato "DD de MMMM de YYYY"
                                     dateParts = dateStr.split(' de ');
                                     if (dateParts.length === 3) {
                                         const [day, month, year] = dateParts;
-                            
+                        
                                         const months = {
                                             'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
                                             'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
                                         };
-                            
+                        
                                         const monthIndex = months[month.toLowerCase()];
                                         if (monthIndex !== undefined) {
                                             return new Date(year, monthIndex, day);
                                         }
                                     }
-                            
-                                    console.error('La fecha no tiene el formato esperado:', dateStr);
+                        
                                     return null;
                                 }
-                            
+                        
                                 document.addEventListener('DOMContentLoaded', function() {
                                     // Obtener todas las filas del cuerpo de la tabla
                                     const rows = document.querySelectorAll('#tabla_fichas tbody tr');
-                            
+                        
                                     rows.forEach(row => {
                                         // Obtener las celdas de fecha límite y estado/fecha DAJ
                                         const fechaLimiteCell = row.querySelector('td:nth-child(10)');
                                         const fechaITCell = row.querySelector('td:nth-child(2)');
-                                        const estadoFechaDAJCell = row.querySelector('td:nth-child(6)'); // Asumiendo que la columna de estado/fecha DAJ es la novena
-                            
+                                        const estadoFechaDAJCell = row.querySelector('td:nth-child(6)'); // Asumiendo que la columna de estado/fecha DAJ es la sexta
+                        
                                         if (fechaLimiteCell && fechaITCell && estadoFechaDAJCell) {
                                             // Obtener las fechas y estado/fecha DAJ como cadenas de texto
                                             const fechaLimiteStr = fechaLimiteCell.innerText.trim();
                                             const fechaITStr = fechaITCell.innerText.trim();
                                             const estadoFechaDAJStr = estadoFechaDAJCell.innerHTML.trim().split('<br>'); // Separar estado y fecha DAJ
-                            
+                        
                                             const estado = estadoFechaDAJStr[0].trim();
                                             const fechaDAJStr = estadoFechaDAJStr[1] ? estadoFechaDAJStr[1].trim() : null;
-                            
+                        
                                             // Convertir las fechas de cadena de texto a objetos Date
                                             const fechaLimite = parseDate(fechaLimiteStr);
                                             const fechaIT = parseDate(fechaITStr);
                                             const fechaDAJ = fechaDAJStr ? parseDate(fechaDAJStr) : null;
                                             const fechaActual = new Date();                            
-                            
+                        
                                             if (fechaLimite && fechaIT) {
                                                 // Calcular los días hábiles entre la fecha actual y la fecha límite
-                                                const diasRestantes = calculateBusinessDays(fechaActual, fechaLimite);
+                                                const diasRestantes = calculateBusinessDays(fechaIT, fechaLimite);
                                                 // Colocar el resultado en la celda correspondiente y cambiar el color de fondo
                                                 const diasRestantesCell = row.querySelector('.td_dias_restantes');
                                                 if (diasRestantesCell) {
@@ -305,7 +350,7 @@ th {
                                                         diasRestantesCell.style.color = '#ffffff'; // Contraste con el fondo azul
                                                     } else {
                                                         diasRestantesCell.innerText = diasRestantes;
-                            
+                        
                                                         if (diasRestantes <= 3) {
                                                             diasRestantesCell.style.backgroundColor = '#E73C45';
                                                             diasRestantesCell.style.color = '#ffffff'; // Contraste con el fondo rojo
@@ -323,15 +368,8 @@ th {
                                     });
                                 });
                             </script>
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
                         </td>
+                        
                         
                         
                     </tr>
@@ -520,6 +558,9 @@ th {
                             previewDataElement.innerHTML += '<br><a class="monospace" href="' + data.archivo_adjunto_url + '" download>Descargar Archivo Adjunto</a>';
                         }
 
+                        // Agregar botón de edición
+                        previewDataElement.innerHTML += '<br><a href="/accion/editar_solicitud/' + solicitudId + '" class="btn btn-primary">Editar Solicitud</a>';
+
                         $('#previewModal').modal('show'); // Mostrar el modal utilizando jQuery
                     }
                 };
@@ -528,6 +569,7 @@ th {
         });
     });
 </script>
+
 
 
 
@@ -570,7 +612,8 @@ th {
                                 
                                 // Verificar si el tipo es 'A' y el usuario es ADMIN para mostrar el botón de edición
                                 if (tipo === 'A' && data.departamento && data.departamento === 'ADMIN') {
-                                    previewDataText += '<a href="respuesta_edit/' + respuesta.id + '" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
+                                    previewDataText += '<a href="respuesta_edit/' + respuesta.id + '?tipo=A" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
+
                                 }
 
                                 previewDataText += '<hr>';
@@ -596,7 +639,8 @@ th {
 
                             // Verificar si el tipo es 'A' y el usuario es ADMIN para mostrar el botón de edición
                             if (tipo === 'A' && data.departamento && data.departamento === 'ADMIN') {
-                                previewDataText += '<a href="respuesta_edit/' + data.respuesta.id + '" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
+                                previewDataText += '<a href="respuesta_edit/' + respuesta.id + '?tipo=A" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
+
                             }
                         }
 
@@ -615,5 +659,4 @@ th {
     addPreviewEventListener('.preview-res-amparo-link', 'A');
     addPreviewEventListener('.preview-res-respuesta-link', 'R');
 </script>
-
 {% endblock custom_js %}

@@ -26,4 +26,7 @@ urlpatterns = [
     path('respuesta_edit/<int:id>', views.respuesta_edit, name="respuesta_edit"),
     path('amparo/<int:id>', views.respuesta, name="amparo"),
     path('prorroga/<int:id>/', views.prorroga, name='prorroga'),
+    path('accion/editar_solicitud/<int:id>/', views.editar_solicitud, name='editar_solicitud'),
+    path('editar_solicitud/<int:solicitud_id>/', views.editar_solicitud, name='editar_solicitud'),
+    # Otras rutas...
 ]

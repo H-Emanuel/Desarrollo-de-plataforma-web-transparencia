@@ -1,0 +1,85 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block main_content %}
+  <section class="container">
+    <h1>Editar Solicitud</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="fecha_i_t" class="form-label">Ingreso a Portal de Transparencia</label>
+        <input type="date" class="form-control" id="fecha_i_t" name="fecha_i_t" 
+               value="{{ solicitud.fecha_i_t|date:'Y-m-d' }}" 
+               max="{{ today }}" 
+               {% if not es_admin %}disabled{% endif %} />
+      </div>
+      <div class="mb-3">
+        <label for="fecha_i_au" class="form-label">Ingreso a Asesoría Urbana</label>
+        <input type="date" class="form-control" id="fecha_i_au" name="fecha_i_au" 
+               value="{{ solicitud.fecha_i_au|date:'Y-m-d' }}" 
+               max="{{ today }}" 
+               {% if not es_admin %}disabled{% endif %} />
+      </div>
+      <div class="mb-3">
+        <label for="N_transparencia" class="form-label">N° de Folio</label>
+        <input type="text" class="form-control" id="N_transparencia" name="N_transparencia" value="{{ solicitud.N_transparencia }}" />
+      </div>
+      <div class="mb-3">
+        <label for="solicitud_text" class="form-label">Texto de la Solicitud</label>
+        <textarea class="form-control" id="solicitud_text" name="solicitud_text">{{ solicitud.solicitud_text }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label for="archivo_adjunto" class="form-label">Archivo Adjunto</label>
+        <input type="file" class="form-control" id="archivo_adjunto" name="archivo_adjunto" />
+      </div>
+      <div class="mb-3">
+        <label for="fecha_limite" class="form-label">Fecha Límite</label>
+        <input type="date" class="form-control" id="fecha_limite" name="fecha_limite" readonly {% if not es_admin %}disabled{% endif %}/>
+      </div>
+      <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    </form>
+  </section>
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var fecha_i_t_input = document.getElementById('fecha_i_t');
+      var fecha_limite_input = document.getElementById('fecha_limite');
+      var tipo_solicitud = '{{ solicitud.N_transparencia|first }}';
+    
+      function calcularFechaLimite(fechaIngreso, tipoSolicitud) {
+        var diasHabiles = 0;
+        var fechaActual = new Date(fechaIngreso);
+        var diasLimite = tipoSolicitud !== 'C' ? 20 : 10;
+    
+        while (diasHabiles < diasLimite) {
+          var diaSemana = fechaActual.getUTCDay();
+          if (diaSemana !== 0 && diaSemana !== 6) {
+            // Excluir sábados y domingos
+            diasHabiles++;
+          }
+          fechaActual.setUTCDate(fechaActual.getUTCDate() + 1);
+        }
+    
+        // Restar un día para incluir la fecha de ingreso
+        fechaActual.setUTCDate(fechaActual.getUTCDate() - 1);
+    
+        return fechaActual.toISOString().split('T')[0];
+      }
+    
+      fecha_i_t_input.addEventListener('change', function () {
+        var fechaIngreso = this.value;
+        var fechaLimite = calcularFechaLimite(fechaIngreso, tipo_solicitud);
+        fecha_limite_input.value = fechaLimite;
+      });
+    
+      // Calcular la fecha límite al cargar la página
+      var fechaIngresoInicial = fecha_i_t_input.value;
+      if (fechaIngresoInicial) {
+        var fechaLimiteInicial = calcularFechaLimite(fechaIngresoInicial, tipo_solicitud);
+        fecha_limite_input.value = fechaLimiteInicial;
+      }
+    });
+  </script>
+{% endblock %}

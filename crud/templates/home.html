@@ -341,7 +341,7 @@
                             <div class="form-group">
                                 <label class="form-label" for="departamento_admin"><b>Departamento </b></label>
                                 <select class="form-control" id="departamento_admin" name="departamento_admin" >
-                                    <option value="{{ departamento_admin.DEPARTAMENTO_CHOICES }}" selected></option>
+                                    <option value="{{ departamento_admin.DEPARTAMENTO_CHOICES }}" selected required></option>
                                     {% for departamento_admins in OPTIONS.DEPARTAMENTO_CHOICES %}
                                         <option value="{{ departamento_admins.0 }}">{{ departamento_admins.1 }}</option>
                                     {% endfor %}
