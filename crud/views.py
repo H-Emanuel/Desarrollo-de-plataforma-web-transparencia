@@ -100,8 +100,7 @@ def home(request):
 def read(request):
     user = request.user
 
-    # CABMIAR_ESE CODIGO MAS IMPORTANTE 
-
+    # Obtener el departamento del usuario
     departamento_usuario = Departamento.objects.filter(id_usuario=user).first()
 
     if departamento_usuario and departamento_usuario.nombre_departamento == 'ADMIN':
@@ -113,17 +112,15 @@ def read(request):
             solicitud_respuesta_list.append((solicitud, respuesta, departamento_origen))
 
     else:
-        # Si el usuario no es del departamento 'ADMIN', filtrar por usuario
+        # Filtrar las solicitudes por el departamento del usuario
+        solicitudes = Solicitud.objects.filter(id_usuario__in=User.objects.filter(departamento__nombre_departamento=departamento_usuario.nombre_departamento))
         solicitud_respuesta_list = []
-        for solicitud in Solicitud.objects.filter(id_usuario=user):
+        for solicitud in solicitudes:
             try:
-                # Intentar obtener la primera respuesta asociada a esta Solicitud
                 respuesta = Respuesta_solicitud.objects.filter(id_solicitud=solicitud).first()
             except Respuesta_solicitud.DoesNotExist:
-                # Si no hay respuesta asociada, asignar None
                 respuesta = None
             except MultipleObjectsReturned:
-                # Si hay múltiples respuestas, tomar la primera que entró
                 respuesta = Respuesta_solicitud.objects.filter(id_solicitud=solicitud).first()
             
             departamento_origen = Departamento.objects.filter(id_usuario=solicitud.id_usuario).first()

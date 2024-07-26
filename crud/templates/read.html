@@ -241,11 +241,7 @@ th {
                         <td class="invisible">{{ Solicitud.solicitud_text }}</td>
                         <td class="respuesta">{{ respuesta.respuesta }}</td>
                         <td>{{ Solicitud.fecha_limite|date:"M. d, Y" }}</td>
-                        {% if departamento.nombre_departamento == 'ADMIN' %}
-                        <td>{{ Solicitud.Departamento_admin }}</td>
-                        {% else %}
                         <td>{{ Departamento.nombre_departamento }}</td>
-                        {% endif %}
             
                         <td class="td_dias_restantes">
                             <script>
@@ -510,7 +506,7 @@ th {
             $respuesta[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     });
-</script> 
+</script>
 
 
 <script>
