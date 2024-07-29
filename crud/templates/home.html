@@ -3,35 +3,6 @@
 {% load static %}
 
 {% block main_content%}
-<style>
-    .mi-enlace {
-      padding: 12px 24px;
-      font-size: 18px;
-      border-radius: 25px;
-      background-color: #ff9800;
-      color: #fff;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease; /* Agregamos color a la transición */
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Estilo al pasar el mouse por encima */
-    .mi-enlace:hover {
-      background-color: #ffba68;
-      transform: translateY(-2px);
-    }
-    
-    /* Estilo cuando se hace clic */
-    .mi-enlace:active {
-      transform: translateY(0);
-      box-shadow: none;
-      color: #fff; /* Mantenemos el color del texto como blanco al hacer clic */
-    }
-    
-
-    
-    </style>  
 <section class="container" >
   
     <div class="row">
@@ -39,6 +10,11 @@
             <div class="p-2 mb-4 mt-3 ">
                 <div class="container-fluid py-5">
                     <h1 style="color: rgb(0, 157, 255); font-family: sans-serif" class="display-5 fw-bold">CREACIÓN DE FICHA TRANSPARENCIA ASESORIA URBANA</h1>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <a class="mi-enlace" href="javascript:history.back()">Volver</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -267,63 +243,59 @@
         </div>
       </div>
     </div>
-      <div class="accordion-item" style="color: rgb(141, 0, 0);">
+    <div class="accordion-item" style="color: rgb(141, 0, 0);">
         <h2 class="accordion-header" id="headingTree">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTree" aria-expanded="false" aria-controls="collapseOne">
                 3.- Datos de la persona
             </button>
         </h2>
-
-    <div id="collapseTree" class="accordion-collapse collapse" aria-labelledby="headingTree" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-
-
-        <div class="row">
-            <div class="col-12">
-                <div class="form-group">
-                    <label class="form-label" for="persona"><b>Persona</b></label>
-                    <select class="form-control" id="persona" name="persona" >
-                        <option value="{{ persona.RESPUESTA_PERSONA_CHOICES }}" selected></option>
-                        {% for persona_natural in OPTIONS.RESPUESTA_PERSONA_CHOICES %}
-                            <option value="{{ persona_natural.0 }}">{{ persona_natural.1 }}</option>
-                        {% endfor %}
-                    </select>         
+    
+        <div id="collapseTree" class="accordion-collapse collapse" aria-labelledby="headingTree" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label" for="persona"><b>Persona</b></label>
+                            <select class="form-control" id="persona" name="persona" >
+                                <option value="" selected>Selecciona una opción</option>
+                                {% for persona_natural in OPTIONS.RESPUESTA_PERSONA_CHOICES %}
+                                    <option value="{{ persona_natural.0 }}">{{ persona_natural.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label" for="nombre_o_razon_social"><b>Nombre o Razón Social</b></label>
+                            <input type="text" class="form-control" id="nombre_o_razon_social" name="nombre_o_razon_social" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label" for="primer_apellido"><b>Primer Apellido</b></label>
+                            <input type="text" class="form-control" id="primer_apellido" name="primer_apellido" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label" for="segundo_apellido"><b>Segundo Apellido</b></label>
+                            <input type="text" class="form-control" id="segundo_apellido" name="segundo_apellido" autocomplete="off">
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-
-
-          <div class="row">
-            <div class="col-12">
-                <div class="form-group">
-                    <label class="form-label" for="nombre_o_razon_social"><b>Nombre o Razón Social</b></label>
-                    <input type="text" class="form-control" id="nombre_o_razon_social" name="nombre_o_razon_social" value="" >
-                </div>
-            </div>
-        </div>
-
-          <div class="row">
-              <div class="col-12">
-                  <div class="form-group">
-                      <label class="form-label" for="primer_apellido"><b>Primer Apellido</b></label>
-                      <input type="text" class="form-control" id="primer_apellido" name="primer_apellido" value="" >
-                  </div>
-              </div>
-          </div>
-
-          <div class="row">
-            <div class="col-12">
-                <div class="form-group">
-                    <label class="form-label" for="segundo_apellido"><b>Segundo Apellido</b></label>
-                    <input type="text" class="form-control" id="segundo_apellido" name="segundo_apellido" value="" >
-                </div>
-            </div>
-        </div>
-          
-
-         </div>
         </div>
     </div>
+    
 
     {% if departamento.nombre_departamento == 'ADMIN' %}
 
@@ -380,6 +352,52 @@
 
 {% block custom_js %}
 <!-- DESACTIVAR O ACTIVAR INSERT DE OTROS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<script>
+    $(function() {
+        function setupAutocomplete(selector, field) {
+            $(selector).autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url: "{% url 'autocomplete_persona' %}",
+                        dataType: "json",
+                        data: {
+                            term: request.term,
+                            field: field
+                        },
+                        success: function(data) {
+                            // Filtrar resultados únicos en el cliente
+                            const uniqueData = Array.from(new Set(data.map(item => item.value)))
+                                .map(value => data.find(item => item.value === value));
+                            
+                            response(uniqueData);
+                        }
+                    });
+                },
+                minLength: 2,
+                select: function(event, ui) {
+                    if (field === 'nombre_o_razon_social') {
+                        $('#nombre_o_razon_social').val(ui.item.value);
+                    } else if (field === 'primer_apellido') {
+                        $('#primer_apellido').val(ui.item.value);
+                    } else if (field === 'segundo_apellido') {
+                        $('#segundo_apellido').val(ui.item.value);
+                    }
+                    return false;
+                }
+            });
+        }
+
+        setupAutocomplete("#nombre_o_razon_social", 'nombre_o_razon_social');
+        setupAutocomplete("#primer_apellido", 'primer_apellido');
+        setupAutocomplete("#segundo_apellido", 'segundo_apellido');
+    });
+</script>
+
+
 <script>
     function obtenerFechaActual() {
         const ahora = new Date();

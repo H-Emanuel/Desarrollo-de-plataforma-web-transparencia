@@ -158,3 +158,33 @@ table.dataTable.table-striped > tbody > tr.odd > td.td_dias_restantes {
     min-width: 800px;
   }
 }
+
+
+.mi-enlace {
+  padding: 12px 24px;
+  font-size: 18px;
+  border-radius: 10px;
+  background-color: #ff9800;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease; /* Agregamos color a la transición */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo al pasar el mouse por encima */
+.mi-enlace:hover {
+  background-color: #ffba68;
+  transform: translateY(-2px);
+  color: #fff;
+
+}
+
+/* Estilo cuando se hace clic */
+.mi-enlace:active {
+  transform: translateY(0);
+  box-shadow: none;
+  color: #fff; /* Mantenemos el color del texto como blanco al hacer clic */
+}
+
+

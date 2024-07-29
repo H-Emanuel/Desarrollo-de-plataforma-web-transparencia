@@ -3,31 +3,7 @@
 {% load static %}
 
 {% block main_content%}
-<style>
-    .mi-enlace {
-      padding: 12px 24px;
-      font-size: 18px;
-      border-radius: 25px;
-      background-color: #ff9800;
-      color: #fff;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease, color 0.2s ease; /* Agregamos color a la transición */
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Estilo al pasar el mouse por encima */
-    .mi-enlace:hover {
-      background-color: #ffba68;
-      transform: translateY(-2px);
-    }
-    
-    /* Estilo cuando se hace clic */
-    .mi-enlace:active {
-      transform: translateY(0);
-      box-shadow: none;
-      color: #fff; /* Mantenemos el color del texto como blanco al hacer clic */
-    }
+<style>    
     .custom-file-upload {
     display: inline-block;
     padding: 10px 15px;
@@ -65,6 +41,12 @@
                                             
                     {% endif %}
                 </div>  
+                <!-- Botón para volver a la página anterior -->
+                <div class="row">
+                    <div class="col-12">
+                        <a class="mi-enlace" href="javascript:history.back()">Volver</a>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -76,7 +58,7 @@
             
 
           <form action="" method='POST' enctype="multipart/form-data">
-
+            
             <div class="row">
                 <div class="col-12">
                     <div class="form-group">

@@ -28,5 +28,6 @@ urlpatterns = [
     path('prorroga/<int:id>/', views.prorroga, name='prorroga'),
     path('accion/editar_solicitud/<int:id>/', views.editar_solicitud, name='editar_solicitud'),
     path('editar_solicitud/<int:solicitud_id>/', views.editar_solicitud, name='editar_solicitud'),
+    path('autocomplete_persona/', views.autocomplete_persona, name='autocomplete_persona'),
     # Otras rutas...
 ]

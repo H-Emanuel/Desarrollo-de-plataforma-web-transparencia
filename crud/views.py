@@ -51,9 +51,9 @@ def home(request):
         forma_de_recepccion = request.POST['forma_de_recepccion']
         otra_forma_De_entrega = request.POST['otra_forma_De_entrega']
         persona = request.POST['persona']
-        nombre_o_razon_social = request.POST['nombre_o_razon_social']
-        primer_apellido = request.POST['primer_apellido']
-        segundo_apellido = request.POST['segundo_apellido']
+        nombre_o_razon_social = request.POST['nombre_o_razon_social'].upper()
+        primer_apellido = request.POST['primer_apellido'].upper()
+        segundo_apellido = request.POST['segundo_apellido'].upper()
 
         # Calcular la fecha límite según el tipo de solicitud
         fecha_limite = calcular_fecha_limite(fecha_ingreso_t, N_transparencia[0])
@@ -497,3 +497,31 @@ def respuesta_edit(request, id=0):
         return redirect('read')
 
     return render(request, 'crud_respuesta.html', data)
+
+
+
+
+
+def autocomplete_persona(request):
+    term = request.GET.get('term', '')
+    field = request.GET.get('field', '')  # Parámetro para indicar el campo
+    
+    # Realizar búsqueda en función del campo
+    if field == 'nombre_o_razon_social':
+        personas = Solicitud.objects.filter(
+            nombre_o_razon_social__icontains=term
+        ).values_list('nombre_o_razon_social', flat=True).distinct()
+    elif field == 'primer_apellido':
+        personas = Solicitud.objects.filter(
+            primer_apellido__icontains=term
+        ).values_list('primer_apellido', flat=True).distinct()
+    elif field == 'segundo_apellido':
+        personas = Solicitud.objects.filter(
+            segundo_apellido__icontains=term
+        ).values_list('segundo_apellido', flat=True).distinct()
+    else:
+        personas = []
+    
+    results = [{'label': persona, 'value': persona} for persona in personas]
+    
+    return JsonResponse(results, safe=False)

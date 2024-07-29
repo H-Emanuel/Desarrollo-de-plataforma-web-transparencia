@@ -245,22 +245,23 @@ th {
             
                         <td class="td_dias_restantes">
                             <script>
-                                // Función para calcular los días hábiles entre dos fechas, incluyendo el primer día
+                                // Función para calcular los días hábiles entre dos fechas
                                 function calculateBusinessDays(startDate, endDate) {
                                     let count = 0;
                                     let curDate = new Date(startDate.getTime());
-                        
-                                    // Si la fecha de inicio es el mismo día que la fecha actual, inclúyela en el conteo
-                                    if (startDate.toDateString() === curDate.toDateString()) {
-                                        count++;
-                                    }
-                        
-                                    while (curDate < endDate) {
+                                    
+                                    while (curDate <= endDate) {
                                         const dayOfWeek = curDate.getDay();
                                         if (dayOfWeek !== 0 && dayOfWeek !== 6) { // No contar sábados y domingos
                                             count++;
                                         }
                                         curDate.setDate(curDate.getDate() + 1);
+                                    }
+                        
+                                    // Incluir el día de inicio en el conteo si es un día hábil
+                                    const startDayOfWeek = startDate.getDay();
+                                    if (startDayOfWeek !== 0 && startDayOfWeek !== 6) {
+                                        count++;
                                     }
                         
                                     return count;
@@ -306,6 +307,7 @@ th {
                                         }
                                     }
                         
+                                    console.error('La fecha no tiene el formato esperado:', dateStr);
                                     return null;
                                 }
                         
@@ -317,7 +319,7 @@ th {
                                         // Obtener las celdas de fecha límite y estado/fecha DAJ
                                         const fechaLimiteCell = row.querySelector('td:nth-child(10)');
                                         const fechaITCell = row.querySelector('td:nth-child(2)');
-                                        const estadoFechaDAJCell = row.querySelector('td:nth-child(6)'); // Asumiendo que la columna de estado/fecha DAJ es la sexta
+                                        const estadoFechaDAJCell = row.querySelector('td:nth-child(6)'); // Asumiendo que la columna de estado/fecha DAJ es la novena
                         
                                         if (fechaLimiteCell && fechaITCell && estadoFechaDAJCell) {
                                             // Obtener las fechas y estado/fecha DAJ como cadenas de texto
@@ -336,7 +338,7 @@ th {
                         
                                             if (fechaLimite && fechaIT) {
                                                 // Calcular los días hábiles entre la fecha actual y la fecha límite
-                                                const diasRestantes = calculateBusinessDays(fechaIT, fechaLimite);
+                                                const diasRestantes = calculateBusinessDays(fechaActual, fechaLimite);
                                                 // Colocar el resultado en la celda correspondiente y cambiar el color de fondo
                                                 const diasRestantesCell = row.querySelector('.td_dias_restantes');
                                                 if (diasRestantesCell) {
@@ -365,6 +367,7 @@ th {
                                 });
                             </script>
                         </td>
+                        
                         
                         
                         
