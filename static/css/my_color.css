@@ -187,4 +187,40 @@ table.dataTable.table-striped > tbody > tr.odd > td.td_dias_restantes {
   color: #fff; /* Mantenemos el color del texto como blanco al hacer clic */
 }
 
+/* Establecer una altura mínima para las celdas de la columna de respuestas */
+td.respuesta {
+  min-height: 200px; /* Ajusta esta altura según tus necesidades */
+  
+}
+
+/* Establecer un ancho fijo para la columna de respuesta */
+.respuesta {
+  display: block;
+  width: 300px; /* Ajusta este valor según sea necesario */
+  overflow: hidden; /* Ocultar el contenido que exceda el ancho */
+  white-space: pre-wrap; /* Mantener los saltos de línea */
+  text-overflow: ellipsis; /* Agregar puntos suspensivos al final del contenido truncado */
+}
+
+/* Estilos para el texto expandido */
+.texto-restante {
+  display: block; /* Asegurar que el texto expandido se muestre en bloque */
+  width: 300px; /* Debe coincidir con el ancho del contenedor cuando está colapsado */
+}
+
+/* Color de texto normal */
+.respuesta, .texto-restante {
+  color: black; /* Color del texto cuando está expandido y contraído */
+}
+
+/* Estilos para los enlaces */
+.mostrar-mas, .enlace-mostrar, .enlace-ocultar {
+  color: blue; /* Color del texto de los enlaces */
+  cursor: pointer;
+}
+
+.enlace-mostrar:hover, .enlace-ocultar:hover {
+  text-decoration: underline; /* Subrayar los enlaces al pasar el cursor */
+}
+
 

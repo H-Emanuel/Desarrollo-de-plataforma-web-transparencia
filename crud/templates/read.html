@@ -70,7 +70,7 @@ th {
                         <td>{{ Solicitud.nombre_o_razon_social }} {{ Solicitud.primer_apellido }}</td>
                         <td>{{ Solicitud.N_transparencia }}</td>
                         <td>{{ Solicitud.estado }}  <br> {{ respuesta.fecha_daj }}</td>
-            
+                        
                         <td class="td_buttons">
                             <a href="#" class="btn btn-purple preview-link" data-id="{{ Solicitud.id }}">Ver Solicitud</a>                  
                         
@@ -307,7 +307,7 @@ th {
                                         }
                                     }
                         
-                                    console.error('La fecha no tiene el formato esperado:', dateStr);
+                                    
                                     return null;
                                 }
                         
@@ -425,64 +425,80 @@ th {
 
 <script>
     $(document).ready(function () {
-        function procesarContenidoExtendido() {
-            $('.respuesta').each(function () {
-                var $respuesta = $(this);
-                var contenido = $respuesta.data('original-text');
-                
-                if (!contenido) {
-                    contenido = $respuesta.text().trim();
-                    $respuesta.data('original-text', contenido);
+        // Nueva función para procesar contenido
+        function procesarContenido($respuesta) {
+            var contenido = $respuesta.data('original-text');
+            if (!contenido) {
+                contenido = $respuesta.text().trim();
+                $respuesta.data('original-text', contenido);
+            }
+    
+            if (contenido.length > 190) {
+                var recortado = contenido.substring(0, 190);
+                var restante = contenido.substring(190);
+    
+                // Evitar cortar palabras
+                var ultimoEspacio = recortado.lastIndexOf(' ');
+                if (ultimoEspacio > 0) {
+                    recortado = recortado.substring(0, ultimoEspacio);
+                    restante = contenido.substring(ultimoEspacio);
                 }
     
-                if (contenido.length > 170) {
-                    var recortado = contenido.substring(0, 170);
-                    var restante = contenido.substring(170);
-                    $respuesta.html(recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>');
-                } else {
-                    $respuesta.html(contenido);
-                }
-            });
-        }
-    
-        function resaltarPalabrasBuscadas() {
-            var searchTerm = $('#tabla_fichas_filter input').val().trim();
-            if (searchTerm !== '') {
-                var regex = new RegExp('(' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')', 'ig');
-                $('.respuesta').each(function() {
-                    var originalText = $(this).data('original-text');
-                    if (!originalText) {
-                        originalText = $(this).text();
-                        $(this).data('original-text', originalText);
-                    }
-                    var highlightedText = originalText.replace(regex, '<span class="resaltado">$1</span>');
-                    var contenidoLength = originalText.length;
-                    if (contenidoLength > 250) {
-                        var recortado = highlightedText.substring(0, 250);
-                        var restante = highlightedText.substring(250);
-                        $(this).html(recortado + '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span><span class="texto-restante" style="display:none;">' + restante + ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>');
-                    } else {
-                        $(this).html(highlightedText);
-                    }
-                });
+                $respuesta.html(
+                    recortado + 
+                    '<span class="mostrar-mas">... <a href="#" class="enlace-mostrar">Mostrar más</a></span>' + 
+                    '<span class="texto-restante" style="display:none;">' + 
+                    restante + 
+                    ' <a href="#" class="enlace-ocultar">Mostrar menos</a></span>'
+                );
             } else {
-                procesarContenidoExtendido();
+                $respuesta.html(contenido);
             }
         }
     
+        // Nueva función para resaltar palabras buscadas y procesar contenido
+        function resaltarYProcesar($respuesta, searchTerm) {
+            var originalText = $respuesta.data('original-text') || $respuesta.text().trim();
+            $respuesta.data('original-text', originalText);
+    
+            if (searchTerm) {
+                var regex = new RegExp('(' + searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')', 'ig');
+                var highlightedText = originalText.replace(regex, '<span class="resaltado">$1</span>');
+                $respuesta.html(highlightedText);
+            } else {
+                procesarContenido($respuesta);
+            }
+        }
+    
+        // Inicializar la tabla con DataTables
         var tabla = $('#tabla_fichas').DataTable({
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.12.1/i18n/es-CL.json'
+                url: '{% static "js/datatables/i18n/es-CL.json" %}'
             },
             initComplete: function () {
                 $("#tabla_fichas").show();
-                procesarContenidoExtendido();
+                $('.respuesta').each(function () {
+                    procesarContenido($(this));
+                });
+    
+                // Mover el input de búsqueda al inicio del contenedor de DataTables
+                var searchBox = $(this.api().table().container()).find('.dataTables_filter');
+                searchBox.css({ 'float': 'none', 'margin-bottom': '10px' , 'padding-right': '25px'});
+                $(this.api().table().container()).prepend(searchBox);
+        
+                
             },
             drawCallback: function () {
-                resaltarPalabrasBuscadas();
+                var searchTerm = $('#tabla_fichas_filter input').val().trim();
+                $('.respuesta').each(function () {
+                    resaltarYProcesar($(this), searchTerm);
+                });
+                
+                
             },
             "rowCallback": function (row, data, index) {
-                resaltarPalabrasBuscadas();
+                var searchTerm = $('#tabla_fichas_filter input').val().trim();
+                resaltarYProcesar($(row).find('.respuesta'), searchTerm);
             }
         });
     
@@ -495,7 +511,7 @@ th {
         $('#tabla_fichas tbody').on('click', '.enlace-mostrar', function (e) {
             e.preventDefault();
             var $respuesta = $(this).closest('.respuesta');
-            $respuesta.find('.texto-restante').show();
+            $respuesta.find('.texto-restante').css('display', 'inline');
             $respuesta.find('.mostrar-mas').hide();
         });
     
@@ -504,12 +520,12 @@ th {
             var $respuesta = $(this).closest('.respuesta');
             $respuesta.find('.texto-restante').hide();
             $respuesta.find('.mostrar-mas').show();
-    
-            // Volver a la posición inicial de la respuesta
             $respuesta[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     });
+    
 </script>
+
 
 
 <script>

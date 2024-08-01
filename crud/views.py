@@ -51,9 +51,9 @@ def home(request):
         forma_de_recepccion = request.POST['forma_de_recepccion']
         otra_forma_De_entrega = request.POST['otra_forma_De_entrega']
         persona = request.POST['persona']
-        nombre_o_razon_social = request.POST['nombre_o_razon_social'].upper()
-        primer_apellido = request.POST['primer_apellido'].upper()
-        segundo_apellido = request.POST['segundo_apellido'].upper()
+        nombre_o_razon_social = request.POST['nombre_o_razon_social'].upper().strip()
+        primer_apellido = request.POST['primer_apellido'].upper().strip()
+        segundo_apellido = request.POST['segundo_apellido'].upper().strip()
 
         # Calcular la fecha límite según el tipo de solicitud
         fecha_limite = calcular_fecha_limite(fecha_ingreso_t, N_transparencia[0])
@@ -85,7 +85,7 @@ def home(request):
             persona=persona,
             nombre_o_razon_social=nombre_o_razon_social,
             primer_apellido=primer_apellido,
-            segundo_apellido=segundo_apellido,
+            segundo_apellido=segundo_apellido,  
             id_usuario=request.user,
             fecha_limite=fecha_limite,
             Departamento_admin=Departamento_admin

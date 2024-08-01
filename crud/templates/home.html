@@ -361,18 +361,28 @@
         function setupAutocomplete(selector, field) {
             $(selector).autocomplete({
                 source: function(request, response) {
+                    // Limpiar el término de búsqueda
+                    const cleanedTerm = request.term.trim();
+    
                     $.ajax({
                         url: "{% url 'autocomplete_persona' %}",
                         dataType: "json",
                         data: {
-                            term: request.term,
+                            term: cleanedTerm,
                             field: field
                         },
                         success: function(data) {
-                            // Filtrar resultados únicos en el cliente
-                            const uniqueData = Array.from(new Set(data.map(item => item.value)))
-                                .map(value => data.find(item => item.value === value));
-                            
+                            // Limpiar los resultados antes de mostrarlos
+                            const cleanedData = data.map(item => {
+                                return {
+                                    value: item.value.trim(),
+                                    label: item.label.trim()
+                                };
+                            });
+    
+                            // Filtrar resultados únicos y mostrar
+                            const uniqueData = Array.from(new Set(cleanedData.map(item => item.value)))
+                                .map(value => cleanedData.find(item => item.value === value));
                             response(uniqueData);
                         }
                     });
