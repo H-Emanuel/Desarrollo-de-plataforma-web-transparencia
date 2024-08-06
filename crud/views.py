@@ -1,17 +1,15 @@
 from http.client import HTTPResponse
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.shortcuts import redirect
-from django.contrib.auth.models import User
 from .models import *
 from datetime import datetime,timedelta
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 from PyPDF2 import PdfMerger, PdfReader  
 from django.core.files.base import ContentFile
+from django.http import HttpResponseForbidden
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Solicitud, Respuesta_solicitud, Departamento
 import io
 
 
@@ -154,44 +152,8 @@ def calcular_fecha_limite(fecha_ingreso, tipo_solicitud):
 
 
 
-@login_required
-def editar_solicitud(request, solicitud_id):
-    solicitud = get_object_or_404(Solicitud, pk=solicitud_id)
-    user = request.user
-    today = datetime.today().strftime('%Y-%m-%d')
-    # Consultar el departamento del usuario
-    try:
-        departamento = Departamento.objects.get(id_usuario_id=user.id)
-        es_admin = departamento.nombre_departamento == 'ADMIN'
-    except Departamento.DoesNotExist:
-        es_admin = False
 
-    if request.method == 'POST':
-        solicitud.N_transparencia = request.POST['N_transparencia']
-        solicitud.solicitud_text = request.POST['solicitud_text']
 
-        # Verificar si el usuario tiene permiso para editar las fechas
-        if es_admin:
-            solicitud.fecha_i_t = request.POST['fecha_i_t']
-            solicitud.fecha_i_au = request.POST['fecha_i_au']
-
-        # Si hay un nuevo archivo adjunto, actualizarlo
-        if 'archivo_adjunto' in request.FILES:
-            solicitud.archivo_adjunto = request.FILES['archivo_adjunto']
-
-        # Recalcular y guardar la fecha límite
-        fecha_limite = calcular_fecha_limite(solicitud.fecha_i_t, solicitud.N_transparencia[0])
-        solicitud.fecha_limite = fecha_limite
-
-        solicitud.save()
-        return redirect('home')  # Redirige a la página deseada tras guardar
-
-    context = {
-        'solicitud': solicitud,
-        'es_admin': es_admin,
-        'today': today,
-    }
-    return render(request, 'editar_solicitud.html', context)
 
 
 def calcular_prorroga(fecha_limite, dias_prorroga):
@@ -256,13 +218,8 @@ def vista_previa_respuesta(request, id):
     tipo = request.GET.get('tipo')
     user = request.user
     
-    # Obtener el departamento del usuario actual
-    # CAMIAR ESTE CODIGO DE DEPARTAMENTO
-    try:
-        departamento_usuario = Departamento.objects.get(id_usuario=user)
-        nombre_departamento = departamento_usuario.nombre_departamento
-    except Departamento.DoesNotExist:
-        nombre_departamento = None
+    # Determinar si el usuario puede editar
+    puede_editar = user.is_superuser or user.groups.filter(name='Admins').exists()
 
     if tipo == 'A':
         respuestas = Respuesta_solicitud.objects.filter(id_solicitud=id, tipo=tipo).order_by('fecha_daj')
@@ -275,9 +232,9 @@ def vista_previa_respuesta(request, id):
                     'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
                     'archivo_adjunto_url_2': respuesta.archivo_adjunto_2.url if respuesta.archivo_adjunto_2 else None,
                     'archivo_adjunto_url_3': respuesta.archivo_adjunto_3.url if respuesta.archivo_adjunto_3 else None,
+                    'puede_editar': puede_editar  # Indicar si el usuario puede editar la respuesta
                 } for respuesta in respuestas
-            ],
-            'departamento': nombre_departamento  # Agregar el nombre del departamento al JSON
+            ]
         }
     else:
         respuesta = Respuesta_solicitud.objects.filter(id_solicitud=id, tipo=tipo).last()
@@ -289,12 +246,10 @@ def vista_previa_respuesta(request, id):
                 'archivo_adjunto_url': respuesta.archivo_adjunto.url if respuesta.archivo_adjunto else None,
                 'archivo_adjunto_url_2': respuesta.archivo_adjunto_2.url if respuesta.archivo_adjunto_2 else None,
                 'archivo_adjunto_url_3': respuesta.archivo_adjunto_3.url if respuesta.archivo_adjunto_3 else None,
-                'departamento': nombre_departamento  # Agregar el nombre del departamento al JSON
+                'puede_editar': puede_editar  # Indicar si el usuario puede editar la respuesta
             }
         else:
-            data = {
-                'departamento': nombre_departamento  # Incluso si no hay respuesta, enviar el nombre del departamento
-            }
+            data = {'puede_editar': puede_editar}
     
     return JsonResponse(data)
 
@@ -409,6 +364,7 @@ def respuesta(request, id=0):
         pdf_comprimido_1 = procesar_archivos_adjuntos(archivos_adjuntos_1)
         pdf_comprimido_3 = procesar_archivos_adjuntos(archivos_adjuntos_3)
 
+        # Crear la nueva respuesta y asignar el usuario actual
         Respuesta_solicitud.objects.create(
             fecha_daj=fecha_daj,
             id_solicitud=solicitud,
@@ -416,7 +372,8 @@ def respuesta(request, id=0):
             archivo_adjunto=pdf_comprimido_1,
             archivo_adjunto_2=archivo_adjunto_2,
             archivo_adjunto_3=pdf_comprimido_3,
-            tipo=tipo_respuesta
+            tipo=tipo_respuesta,
+            id_usuario=request.user  # Asignar el usuario que creó la respuesta
         )
 
         if tipo_respuesta == 'A':
@@ -436,15 +393,92 @@ def respuesta(request, id=0):
 
     return render(request, 'crud_respuesta.html', data)
 
+@login_required
+def editar_solicitud(request, solicitud_id):
+    solicitud = get_object_or_404(Solicitud, pk=solicitud_id)
+    user = request.user
+    today = datetime.today().strftime('%Y-%m-%d')
+    
+    try:
+        departamento = Departamento.objects.get(id_usuario_id=user.id)
+        es_admin = departamento.nombre_departamento == 'ADMIN'
+    except Departamento.DoesNotExist:
+        es_admin = False
+
+    # Permitir edición solo si el usuario es ADMIN o si el usuario es el creador de la solicitud
+    if not es_admin and solicitud.id_usuario != user:
+        # Obtener los datos del usuario creador de la solicitud
+        creador = solicitud.id_usuario
+        error_message = (
+            "No tienes permiso para editar esta solicitud.<br>"
+            "Creada por:<br>"
+            f"{creador.first_name} {creador.last_name} ({creador.email})."
+        )
+        # Pasar un mensaje de error al contexto
+        context = {
+            'error_message': error_message,
+            'solicitud': solicitud,
+            'es_admin': es_admin,
+            'today': today,
+        }
+        return render(request, 'editar_solicitud.html', context)
+    
+    if request.method == 'POST':
+        solicitud.N_transparencia = request.POST['N_transparencia']
+        solicitud.solicitud_text = request.POST['solicitud_text']
+
+        if es_admin:
+            solicitud.fecha_i_t = request.POST['fecha_i_t']
+            solicitud.fecha_i_au = request.POST['fecha_i_au']
+
+        if 'archivo_adjunto' in request.FILES:
+            solicitud.archivo_adjunto = request.FILES['archivo_adjunto']
+
+        fecha_limite = calcular_fecha_limite(solicitud.fecha_i_t, solicitud.N_transparencia[0])
+        solicitud.fecha_limite = fecha_limite
+
+        solicitud.save()
+        return redirect('home')
+
+    context = {
+        'solicitud': solicitud,
+        'es_admin': es_admin,
+        'today': today,
+    }
+    return render(request, 'editar_solicitud.html', context)
+
+
 
 @login_required
 def respuesta_edit(request, id=0):
     respuesta = get_object_or_404(Respuesta_solicitud, id=id)
+    user = request.user
+
+    # Verificar si el usuario pertenece al departamento ADMIN
+    try:
+        departamento = Departamento.objects.get(id_usuario=user)
+        es_admin = departamento.nombre_departamento == 'ADMIN'
+    except Departamento.DoesNotExist:
+        es_admin = False
+
+    # Permitir edición solo si el usuario es ADMIN o si el usuario es el creador de la respuesta
+    if not es_admin and respuesta.id_usuario != user:
+        creador = respuesta.id_usuario
+        # Pasar un mensaje de error al contexto
+        context = {
+            'error_message': (
+                f"No tienes permiso para editar esta respuesta.<br>"
+                f"Creada por:<br>"
+                f"{creador.first_name} {creador.last_name} ({creador.email})"
+            ),
+            'Respuesta': respuesta,
+            'es_admin': es_admin,
+        }
+        return render(request, 'crud_respuesta.html', context)
+
     Titulo = "EDICION"
     TEST = ""
 
-
-    # Obtener el tipo de respuesta desde los parámetros de la URL o establecer un valor por defecto
     tipo_respuesta = request.GET.get('tipo', 'R')
     
     if tipo_respuesta == "R":
@@ -452,20 +486,19 @@ def respuesta_edit(request, id=0):
     elif tipo_respuesta == "A":
         TEST = "AMPARO"
 
-    
-
     data = {
         'Respuesta': respuesta,
         'Titulo': Titulo,
         'tipo': tipo_respuesta,
-        'TEST': TEST
-
+        'TEST': TEST,
+        'es_admin': es_admin
     }
-    
 
     if request.method == 'POST':
-        fecha_daj = request.POST['Fecha_ingreso_DAJ']
-        respuesta_text = request.POST['respuesta']
+        if es_admin:
+            respuesta.fecha_daj = request.POST['Fecha_ingreso_DAJ']
+        
+        respuesta.respuesta = request.POST['respuesta']
 
         try:
             archivos_adjuntos_1 = request.FILES.getlist('archivo_adjunto')
@@ -482,13 +515,9 @@ def respuesta_edit(request, id=0):
         except KeyError:
             archivos_adjuntos_3 = None
 
-        # Combinar archivos nuevos con los antiguos
         archivo_adjunto_combinado = combinar_archivos_adjuntos(archivos_adjuntos_1, respuesta.archivo_adjunto)
         archivo_adjunto_3_combinado = combinar_archivos_adjuntos(archivos_adjuntos_3, respuesta.archivo_adjunto_3)
 
-        # Actualizar la respuesta de la solicitud
-        respuesta.fecha_daj = fecha_daj
-        respuesta.respuesta = respuesta_text
         respuesta.archivo_adjunto = archivo_adjunto_combinado
         respuesta.archivo_adjunto_2 = archivo_adjunto_2
         respuesta.archivo_adjunto_3 = archivo_adjunto_3_combinado
@@ -497,10 +526,6 @@ def respuesta_edit(request, id=0):
         return redirect('read')
 
     return render(request, 'crud_respuesta.html', data)
-
-
-
-
 
 def autocomplete_persona(request):
     term = request.GET.get('term', '')

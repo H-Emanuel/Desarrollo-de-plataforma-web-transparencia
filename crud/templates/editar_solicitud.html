@@ -56,6 +56,23 @@
 
 
 
+{% if error_message %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            icon: 'error',
+            title: 'Acceso Denegado',
+            html: '{{ error_message|escapejs }}',  // Cambiado a html
+            confirmButtonText: 'Entendido'
+        }).then(() => {
+            window.location.href = '{% url "read" %}'; // Redirigir a la página de inicio o la que desees
+        });
+    });
+</script>
+{% endif %}
+
+
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       var fecha_i_t_input = document.getElementById('fecha_i_t');

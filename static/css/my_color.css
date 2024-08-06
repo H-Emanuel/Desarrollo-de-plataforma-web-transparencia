@@ -86,6 +86,7 @@ h1 {
 
 .modal-body {
   text-align: justify;
+  font-family: monospace;
 }
 /* Estilos según el estado de los días restantes */
 tbody .td_dias_restantes.dias-urgente {
@@ -224,3 +225,6 @@ td.respuesta {
 }
 
 
+div:where(.swal2-container) .swal2-html-container {  
+  text-align: left !important;  
+}

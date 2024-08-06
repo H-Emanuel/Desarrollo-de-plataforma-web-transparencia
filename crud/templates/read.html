@@ -102,7 +102,7 @@ th {
                                         {% endif %}
                                     {% elif Solicitud.estado == 'Respondida' %}
                                         <a href="#" class="btn btn-purple preview-res-respuesta-link" data-id="{{ Solicitud.id }}">Ver Propuesta Respuesta</a>
-                                        <a href="{% url 'respuesta_edit' respuesta.id %}?tipo=R" class="btn btn-primary">Editar Propuesta de Respuesta</a>
+                                        {% comment %} <a href="{% url 'respuesta_edit' respuesta.id %}?tipo=R" class="btn btn-primary">Editar Propuesta de Respuesta</a> {% endcomment %}
 
                                         {% comment %} <a href="{% url 'respuesta' Solicitud.id %}?tipo=A" class="btn btn-purple">Propuesta de Amparo</a> {% endcomment %}
                                         {% comment %} <a href="#" class="btn btn-purple preview-res-amparo-link" data-id="{{ Solicitud.id }}">Ver Propuesta de Respuesta de Amparo</a> {% endcomment %}
@@ -398,25 +398,7 @@ th {
             </div>
         </div>
         </div>
-
-        <!-- Modal para mostrar la vista previa de la respuesta -->
-    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="previewModalLabel">Vista previa de la respuesta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="previewData">
-                    <!-- Aquí se mostrarán los detalles de la respuesta -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+        
 </section>
 {% endblock main_content %}
 
@@ -606,7 +588,6 @@ th {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var data = JSON.parse(xhr.responseText);
 
-                        // Construir el texto con los datos de la respuesta
                         var previewDataText = '';
                         if (data.respuestas && data.respuestas.length > 0) {
                             data.respuestas.forEach(function(respuesta, index) {
@@ -624,14 +605,8 @@ th {
                                 if (respuesta.archivo_adjunto_url_3) {
                                     previewDataText += '<a href="' + respuesta.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos, PDF, etc)</a><br>';
                                 }
-                                
-                                // Verificar si el tipo es 'A' y el usuario es ADMIN para mostrar el botón de edición
-                                if (tipo === 'A' && data.departamento && data.departamento === 'ADMIN') {
-                                    previewDataText += '<a href="respuesta_edit/' + respuesta.id + '?tipo=A" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
 
-                                }
-
-                                previewDataText += '<hr>';
+                                previewDataText += '<a href="respuesta_edit/' + respuesta.id + '?tipo=' + tipo + '" class="btn btn-purple" style="margin-bottom: 0px;">Editar Propuesta de Amparo</a><br>';
                             });
                         } else if (tipo === 'A') {
                             // Si no hay respuestas de tipo 'A' (Amparo), mostrar mensaje
@@ -651,17 +626,12 @@ th {
                             if (data.archivo_adjunto_url_3) {
                                 previewDataText += '<a href="' + data.archivo_adjunto_url_3 + '" download>Descargar Archivo Adjunto (Planos, Decretos, PDF, etc)</a><br>';
                             }
-
-                            // Verificar si el tipo es 'A' y el usuario es ADMIN para mostrar el botón de edición
-                            if (tipo === 'A' && data.departamento && data.departamento === 'ADMIN') {
-                                previewDataText += '<a href="respuesta_edit/' + respuesta.id + '?tipo=A" class="btn btn-purple" style="margin-bottom: 0px;">Editar Respuesta de Amparo</a><br>';
-
-                            }
+                            // Agregar botón de edición si el usuario no es admin también
+                            previewDataText += '<a href="respuesta_edit/' + data.id + '?tipo=' + tipo + '" class="btn btn-purple" style="margin-bottom: 0px;">Editar Propuesta de Respuesta</a><br>';
                         }
 
                         var previewDataElement = document.getElementById('previewData');
-                        previewDataElement.innerHTML = '<div class="monospace">' + previewDataText + '</div>';
-
+                        previewDataElement.innerHTML = previewDataText;
                         $('#previewModal').modal('show'); // Mostrar el modal utilizando jQuery
                     }
                 };
@@ -674,4 +644,5 @@ th {
     addPreviewEventListener('.preview-res-amparo-link', 'A');
     addPreviewEventListener('.preview-res-respuesta-link', 'R');
 </script>
+
 {% endblock custom_js %}

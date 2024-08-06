@@ -2,45 +2,35 @@
 
 {% load static %}
 
-{% block main_content%}
-<style>    
+{% block main_content %}
+<style>
     .custom-file-upload {
-    display: inline-block;
-    padding: 10px 15px;
-    cursor: pointer;
-    border: 2px solid #5b5b5b; /* Color de borde */
-    background-color: #3e3e3e; /* Color de fondo */
-    color: #fff; /* Color de texto */
-    border-radius: 5px;
-}
+        display: inline-block;
+        padding: 10px 15px;
+        cursor: pointer;
+        border: 2px solid #5b5b5b;
+        background-color: #3e3e3e;
+        color: #fff;
+        border-radius: 5px;
+    }
 
-.custom-file-upload input[type="file"] {
-    display: none;
-}
+    .custom-file-upload input[type="file"] {
+        display: none;
+    }
 
-#nombre_archivo_seleccionado {
-    display: none;
-    margin-left: 10px;
-    font-style: italic;
-}
-
-
-    
-    </style>  
-<section class="container" >
-
+    #nombre_archivo_seleccionado {
+        display: none;
+        margin-left: 10px;
+        font-style: italic;
+    }
+</style>
+<section class="container">
     <div class="row">
         <div class="col-12">
-            <div class="p-2 mb-4 mt-3 ">
-                <div class="container-fluid py-5">                    
-                    {% if tipo == 'R' %}
-                        <h1 style="color: rgb(0, 119, 203); font-family: sans-serif; font-size: 2.6rem" class="display-5 fw-bold">{{ Titulo }} PROPUESTA DE {{ TEST }} ASESORIA URBANA</h1>
-                        
-                    {% else %}
-                        <h1 style="color: rgb(0, 119, 203); font-family: sans-serif; font-size: 2.6rem" class="display-5 fw-bold">{{ Titulo }} PROPUESTA DE {{ TEST }} ASESORIA URBANA</h1>
-                                            
-                    {% endif %}
-                </div>  
+            <div class="p-2 mb-4 mt-3">
+                <div class="container-fluid py-5">
+                    <h1 style="color: rgb(0, 119, 203); font-family: sans-serif; font-size: 2.6rem" class="display-5 fw-bold">{{ Titulo }} PROPUESTA DE {{ TEST }} ASESORIA URBANA</h1>
+                </div>
                 <!-- Botón para volver a la página anterior -->
                 <div class="row">
                     <div class="col-12">
@@ -49,114 +39,116 @@
                 </div>
             </div>
         </div>
-        
-
-
 
         <div class="accordion" id="accordionExample">
-
-            
-
-          <form action="" method='POST' enctype="multipart/form-data">
-            
-            <div class="row">
-                <div class="col-12">
-                    <div class="form-group">
-                        <label class="form-label" for="Fecha_ingreso_DAJ"><b>Fecha de respuesta a DAJ</b></label>
-                        <input type="date" class="form-control" id="Fecha_ingreso_DAJ" name="Fecha_ingreso_DAJ" value="{{ Respuesta.fecha_daj|date:'Y-m-d' }}" placeholder="Fecha_ingreso_DAJ">
-                    </div> 
-                </div>
-            </div>
-            
-        
-
-
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-12">
-                    <div class="form-group">
-                        <label class="form-label" for="respuesta"><b>Respuesta</b></label>
-                        <textarea class="form-control" id="respuesta" name="respuesta" rows="3">{{ Respuesta.respuesta }}</textarea>
+            <form action="" method='POST' enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Mostrar campo de fecha siempre, pero editable solo para admin o en creación -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label" for="Fecha_ingreso_DAJ"><b>Fecha de respuesta a DAJ</b></label>
+                            <input type="date" class="form-control" id="Fecha_ingreso_DAJ" name="Fecha_ingreso_DAJ"
+                                value="{{ Respuesta.fecha_daj|date:'Y-m-d' }}" placeholder="Fecha_ingreso_DAJ"
+                                {% if not es_admin and is_edit %}disabled{% endif %}>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
 
-            <br>
+                <!-- Campos comunes para todos los usuarios -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label" for="respuesta"><b>Respuesta</b></label>
+                            <textarea class="form-control" id="respuesta" name="respuesta"
+                                rows="3">{{ Respuesta.respuesta }}</textarea>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="row">
-                <div class="col-12">
-                    <div class="form-group">
-                        <label class="form-label" for="archivo_adjunto"><b>Archivos adjuntos</b></label>
-                        <br><br>
-                        <label for="archivo_adjunto" class="custom-file-upload">
-                            <input type="file" id="archivo_adjunto" name="archivo_adjunto" accept=".pdf" multiple onchange="mostrarNombreArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1', 'eliminar_archivo_1')">
-                            1. Folio (consulta desde consejo transparencia)
-                        </label>
-                        <span id="nombre_archivo_seleccionado_1">
-                            {% if Respuesta.archivo_adjunto %}
+                <br>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label" for="archivo_adjunto"><b>Archivos adjuntos</b></label>
+                            <br><br>
+                            <label for="archivo_adjunto" class="custom-file-upload">
+                                <input type="file" id="archivo_adjunto" name="archivo_adjunto" accept=".pdf" multiple
+                                    onchange="mostrarNombreArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1', 'eliminar_archivo_1')">
+                                1. Folio (consulta desde consejo transparencia)
+                            </label>
+                            <span id="nombre_archivo_seleccionado_1">
+                                {% if Respuesta.archivo_adjunto %}
                                 {{ Respuesta.archivo_adjunto.name }}
-                            {% endif %}
-                        </span>
-                        <button type="button" id="eliminar_archivo_1" style="display: none;" onclick="eliminarArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1', 'eliminar_archivo_1')">Eliminar</button>
-                        <br><br>
-                        
-                        <label for="archivo_adjunto_2" class="custom-file-upload">
-                            <input type="file" id="archivo_adjunto_2" name="archivo_adjunto_2" accept=".docx" onchange="mostrarNombreArchivo('archivo_adjunto_2', 'nombre_archivo_seleccionado_2', 'eliminar_archivo_2')">
-                            2. Propuesta de respuesta (Respaldo)
-                        </label>
-                        <span id="nombre_archivo_seleccionado_2">
-                            {% if Respuesta.archivo_adjunto_2 %}
+                                {% endif %}
+                            </span>
+                            <button type="button" id="eliminar_archivo_1" style="display: none;"
+                                onclick="eliminarArchivo('archivo_adjunto', 'nombre_archivo_seleccionado_1', 'eliminar_archivo_1')">Eliminar</button>
+                            <br><br>
+
+                            <label for="archivo_adjunto_2" class="custom-file-upload">
+                                <input type="file" id="archivo_adjunto_2" name="archivo_adjunto_2" accept=".docx"
+                                    onchange="mostrarNombreArchivo('archivo_adjunto_2', 'nombre_archivo_seleccionado_2', 'eliminar_archivo_2')">
+                                2. Propuesta de respuesta (Respaldo)
+                            </label>
+                            <span id="nombre_archivo_seleccionado_2">
+                                {% if Respuesta.archivo_adjunto_2 %}
                                 {{ Respuesta.archivo_adjunto_2.name }}
-                            {% endif %}
-                        </span>
-                        <button type="button" id="eliminar_archivo_2" style="display: none;" onclick="eliminarArchivo('archivo_adjunto_2', 'nombre_archivo_seleccionado_2', 'eliminar_archivo_2')">Eliminar</button>
-                        <br><br>
-                        
-                        <label for="archivo_adjunto_3" class="custom-file-upload">
-                            <input type="file" id="archivo_adjunto_3" name="archivo_adjunto_3" accept=".pdf" multiple onchange="mostrarNombreArchivo('archivo_adjunto_3', 'nombre_archivo_seleccionado_3', 'eliminar_archivo_3')">
-                            3. Adjuntos (plano, decreto, pdf)
-                        </label>
-                        <span id="nombre_archivo_seleccionado_3">
-                            {% if Respuesta.archivo_adjunto_3 %}
+                                {% endif %}
+                            </span>
+                            <button type="button" id="eliminar_archivo_2" style="display: none;"
+                                onclick="eliminarArchivo('archivo_adjunto_2', 'nombre_archivo_seleccionado_2', 'eliminar_archivo_2')">Eliminar</button>
+                            <br><br>
+
+                            <label for="archivo_adjunto_3" class="custom-file-upload">
+                                <input type="file" id="archivo_adjunto_3" name="archivo_adjunto_3" accept=".pdf" multiple
+                                    onchange="mostrarNombreArchivo('archivo_adjunto_3', 'nombre_archivo_seleccionado_3', 'eliminar_archivo_3')">
+                                3. Adjuntos (plano, decreto, pdf)
+                            </label>
+                            <span id="nombre_archivo_seleccionado_3">
+                                {% if Respuesta.archivo_adjunto_3 %}
                                 {{ Respuesta.archivo_adjunto_3.name }}
-                            {% endif %}
-                        </span>
-                        <button type="button" id="eliminar_archivo_3" style="display: none;" onclick="eliminarArchivo('archivo_adjunto_3', 'nombre_archivo_seleccionado_3', 'eliminar_archivo_3')">Eliminar</button>
-                        <br><br>
+                                {% endif %}
+                            </span>
+                            <button type="button" id="eliminar_archivo_3" style="display: none;"
+                                onclick="eliminarArchivo('archivo_adjunto_3', 'nombre_archivo_seleccionado_3', 'eliminar_archivo_3')">Eliminar</button>
+                            <br><br>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            
-            
-            
-            
-            <br>
-            <br>
 
+                <br>
+                <br>
 
-
-
-      <div class="row m-3">
-          <div class="col-12">
-              <button hr class="btn btn-purple" type="submit">Guardar Respuesta</button>
-          </div>
-      </div>
-      </form>
-     
-
+                <div class="row m-3">
+                    <div class="col-12">
+                        <button class="btn btn-purple" type="submit">Guardar Respuesta</button>
+                    </div>
+                </div>
+            </form>
         </div>
-
-            
-        </div>
-      </div>
-
     </div>
 </section>
+
 {% endblock main_content %}
 
 {% block custom_js %}
+{% if error_message %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            icon: 'error',
+            title: 'Acceso Denegado',
+            html: '{{ error_message|escapejs }}',  // Cambiado a html
+            confirmButtonText: 'Entendido'
+        }).then(() => {
+            window.location.href = '{% url "read" %}'; // Redirigir a la página de inicio o la que desees
+        });
+    });
+</script>
+{% endif %}
+
 <script>
     function obtenerFechaActual() {
         const ahora = new Date();
@@ -219,6 +211,6 @@ document.querySelector('form').addEventListener('submit', function(event) {
     }
 });
 
-    </script>
-    
+</script>
+
 {% endblock custom_js %}
